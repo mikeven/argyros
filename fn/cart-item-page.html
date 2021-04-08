@@ -1,0 +1,44 @@
+<tr id="itemc{n_i}" class="item donec-condime-fermentum itemc{n_i}">
+	<td class="title text-left">
+		<ul class="list-inline">
+			<li class="image">
+				<a href="product.php?id={idproducto}&iddet={iddetalle}"> 
+					<img src="{img}" alt="{nombre}" width="100"> 
+				</a>
+			</li>
+			<li class="link">
+				<a href="product.php?id={idproducto}&iddet={iddetalle}" target="_blank">
+					<span class="title-5">{nombre}</span>					
+				</a>
+				
+				<div><span class="title-3">Talla: {talla}</span></div>
+			</li>
+		</ul>
+	</td>
+	<td class="title-1"> ${precio} </td>
+	<td align="center">
+		<table class="cart-qty-group" border="0">
+		<tr class="top-labels">
+			<th><i class="fa fa-caret-left fa-2x subs_qty_cart" data-idi="{idi}"></i></th>
+			<th>
+				<input id="q{idi}" class="form-control input-1 replace mq_itemcart" maxlength="3" size="3" 
+				name="cantidad" onKeyPress="return soloNumeros(event)" 
+				value="{cantidad}" data-idi="{idi}">
+			</th>
+			<th><i class="fa fa-2x fa-caret-right sum_qty_cart" data-idi="{idi}"></i></th>
+		</tr>
+		</table>
+	</td>
+	<td class="total title-1">
+		$<span class="subtotal_amount_cart">{stotal}</span>
+	</td>
+	<td class="action">
+		<a id="lnk{idi}" href="#!" data-idi="{idi}" class="e_itemcart">
+			<i class="fa fa-times"></i>&nbsp; Quitar 
+		</a>
+		<div id="oq{idi}" class="toggle_elim_item_cart">
+			<a class="confirm_itemcart" href='#!' data-idi="{idi}" data-row="itemc{n_i}">Confirmar</a> | 
+			<a class="lnkcancel_ei" data-trg="lnk{idi}" data-cnt="oq{idi}" href='#!'>Cancelar</a>
+		</div>
+	</td>
+</tr>

@@ -1,0 +1,20 @@
+<div id="itemc{n_i}" class="items control-container itemc{n_i}">
+	<div class="row items-wrapper">
+		<span class="cart-close delitemcart" title="Quitar" 
+		data-item="itemc{n_i}" data-idi="{idi}" onclick="delcartitem(this)"><i class="fa fa-times"></i>
+		</span>
+		<div class="col-md-8 cart-left">
+			<a class="cart-image" href="product.php?id={idproducto}&iddet={iddetalle}">
+				<img src="{img}" alt="" title="{nombre}" height="50">
+			</a>
+		</div>
+		<div class="col-md-16 cart-right">
+			<div class="cart-title">
+				<a href="product.php?id={idproducto}&iddet={iddetalle}">{nombre}</a>
+			</div>
+			<div class="cart-price">
+				${precio}<span class="x"> x </span>{cantidad} | Talla: {talla}
+			</div>
+		</div>
+	</div>
+</div>
