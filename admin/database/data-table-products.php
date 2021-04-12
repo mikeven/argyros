@@ -9,7 +9,7 @@
 		$q = "select p.id, p.code as codigo, p.name as nombre, p.description as descripcion, 
 		p.visible as visible, ca.name as categoria, sc.name as subcategoria, 
 		p.provider_id1 as idpvd1, p.manfact_code1 as codigof1 FROM products p, categories ca, subcategories sc 
-		where p.category_id = ca.id and p.subcategory_id = sc.id order by p.id DESC limit 500";
+		where p.category_id = ca.id and p.subcategory_id = sc.id order by p.id DESC";
 		
 		$data = mysqli_query( $dbh, $q );
 		$lista = obtenerListaRegistros( $data );
