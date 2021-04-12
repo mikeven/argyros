@@ -183,10 +183,8 @@
 											<div class="input-group mb-3">
 											  <span id="lbtlf" class="input-group-addon">(+000)</span>
 											  <input type="text" class="form-control" name="ntelef" 
-											  id="ntelef" aria-label="Username" 
-											  aria-describedby="basic-addon1">
-											  <input type="hidden" name="telefono" 
-											  id="telefono" value="">
+											  id="ntelef" aria-label="CodArea" aria-describedby="basic-addon1" maxlength="20">
+											  <input type="hidden" name="telefono" id="telefono" value="">
 											</div>
 											</li>
 										</div>

@@ -25,15 +25,16 @@
 <!--[if (gt IE 9)|!(IE)]><!--> 
 <html lang="es" class="no-js"> <!--<![endif]-->
 
-<!-- Mirrored from demo.designshopify.com/html_jewelry/collection.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Jul 2017 16:53:17 GMT -->
-
 <head>
-  <meta charset="UTF-8">
+  <meta name="servername" content="SolucionesXYZ">
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="google-site-verification" content="uMXohbTO1Kgmqq8PSaGTjxNPfuUZxLmcIbZ2cSFhDWI" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
-  <link rel="canonical" href="http://demo.designshopify.com/"/>
-  <meta name="description" content=""/>
-  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <!--<link rel="canonical" href="https://www.argyros.com.pa/subcategories.php" />-->
+  <meta name="description" content="Distribuidor de platería"/>
+  <meta property="og:image" content="https://www.argyros.com.pa/assets/images/a-image.png">
+  <meta name="keywords" content="Argyros, Distribuidor, Platería"/>
   <link rel="icon" type="image/png" href="https://www.argyros.com.pa/assets/images/afavicon.png">
   <title>Catálogo::Argyros</title>
   
