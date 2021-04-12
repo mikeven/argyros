@@ -29,7 +29,7 @@
 	function vaciarCarrito(){
 		//Reinicia el vector de sesión del carrito de compra
 		$_SESSION["cart"] = array();
-		eliminarArchivoCarrito();
+		guardarEstadoCarrito( $_SESSION["cart"], "../fn/" );
 	}
 	/* ----------------------------------------------------------------------------------- */
 	function eliminarItemCarrito( $pos ){
@@ -129,21 +129,22 @@
 		echo json_encode( $carrito );	
 	}
 	/* ----------------------------------------------------------------------------------- */
-	function guardarEstadoCarrito( $carrito ){
+	function guardarEstadoCarrito( $carrito, $dir ){
 		// Guarda el contenido del carrito de compra en el archivo del usuario en sesión
 		$filename = PFXCARTFILE.$_SESSION["user"]["id"];
 
 		$json_string = json_encode( $carrito );
-		$file = "ckfiles/".$filename.".json";
+		$file = $dir."ckfiles/".$filename.".json";
 		file_put_contents( $file, $json_string );
 	}
 	/* ----------------------------------------------------------------------------------- */
 	function eliminarArchivoCarrito(){
 		// Elimina el archivo del carrito de compra asociado al usuario en sesión
+		include( "../fn/fn-constants.php" );
+
 		$filename = PFXCARTFILE.$_SESSION["user"]["id"];
 		if( file_exists( "../fn/ckfiles/".$filename.".json" ) )
 			unlink( "../fn/ckfiles/".$filename.".json" );
-		//var_dump( file_exists( "../fn/ckfiles/".$filename.".json" ) );
 	}
 	/* ----------------------------------------------------------------------------------- */
 	function obtenerContenidoCarritoCompra( $param ){
@@ -163,7 +164,7 @@
 			
 			$carrito = $_SESSION["cart"];
 			if( $param != "" )
-				$ck_cart = guardarEstadoCarrito( $carrito );
+				guardarEstadoCarrito( $carrito, "" );
 		}
 		
 		foreach ( $carrito as $item ) {
@@ -177,7 +178,6 @@
 			$ni++; 
 		}
 
-		$res["data_cart"] = $ck_cart;
 		$res["cart"] = $cart;
 		$res["lpag"] = $lpag;
 		$res["total_price"] = number_format( $total_cart, 2, '.', ',' );

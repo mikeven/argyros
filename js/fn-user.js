@@ -17,13 +17,17 @@ function registrarUsuario(){
             $("#reg-resp").html( loader_gif );
         },
         success: function( response ){
+            console.log(response);
             $("#reg-resp").html( "" );
             res = jQuery.parseJSON( response );
-            //scroll_To();
-            //mensajeAlerta( "#alert-msgs", res.mje );
+            
             if( res.exito == 1 )
                 window.location.href = res.url;
-            else activarBoton( "#btn_register", true );  
+            else{
+                activarBoton( "#btn_register", true );
+                scroll_To();
+                mensajeAlerta( "#alert-msgs", res.mje ); 
+            }  
         }
     });
 }
@@ -183,6 +187,20 @@ $( document ).ready(function() {
                             field: 'passw1',
                             message: 'Las contraseñas deben coincidir'
                         },
+                    }
+                },
+                ntelef: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Debe indicar teléfono'
+                        }
+                    }
+                },
+                pais: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Debe indicar país'
+                        }
                     }
                 },
                 acepto_terminos: {

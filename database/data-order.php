@@ -271,6 +271,7 @@
 			$carrito = $_SESSION["cart"];
 			include( "../database/bd.php" );
 			include( "../fn/fn-cart.php" );
+			include( "../fn/fn-constants.php" );
 		
 			if ( count( $carrito ) > 0 ) {
 				$orden 					= obtenerDatosCreacionOrden( $carrito, $_POST["obs_cliente"] );

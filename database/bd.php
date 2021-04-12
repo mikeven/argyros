@@ -34,8 +34,18 @@
 		}
 		return $lista_c;
 	}
-
-
+	/* ----------------------------------------------------------------------------------- */
+	function escaparCampos( $dbh, $registro ){
+		// Devuelve un arreglo con los valores escapados de sus  
+		// campos de tipo string
+		foreach ( $registro as $campo => $valor ) {
+			$registro[$campo] = $valor;
+			if( is_string( $valor ) )
+				$registro[$campo] = mysqli_real_escape_string( $dbh, $valor );
+		}
+		return $registro;
+	}
+	/* ----------------------------------------------------------------------------------- */
 	function obtenerListaRegistros2( $data ){
 		//Devuelve un arreglo con los resultados de un resultset de BD
 		$lista_c = array();

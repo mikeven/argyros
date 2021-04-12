@@ -318,7 +318,7 @@
 
 		return $data_user["noleidos"];
 	}
-
+	/* ----------------------------------------------------------------------------------- */
 	function cargarContenidoCarritoArchivo(){
 		//Obtiene el contenido del carrito previamente guardado y lo carga en la variable de sesión
 
@@ -402,8 +402,9 @@
 			if ( $usuario["tcliente"] != "Particular" )
 				$usuario["es_empresa"] = 1;
 			
-			$usuario["token"] = obtenerTokenUsuarioNuevo( $usuario );
-			$idu = registrarUsuario( $dbh, $usuario );
+			$usuario["token"] 	= obtenerTokenUsuarioNuevo( $usuario );
+			$usuario 			= escaparCampos( $dbh, $usuario );
+			$idu 				= registrarUsuario( $dbh, $usuario );
 			
 			if( $idu > 0 ){
 				
