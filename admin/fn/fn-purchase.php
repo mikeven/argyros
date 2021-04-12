@@ -186,14 +186,22 @@
 	}
 	/* ----------------------------------------------------------------------------------- */
 	function obtenerItemsPorProveedorOC( $idpvd ){
-		// Devuelve un vector con los ítems en pre-orden dado un id de detalle y un id de proveedor
+		// Devuelve un vector con los ítems en pre-orden de un proveedor y si existen cantidades en cero asociadas
 		$preorden 		= $_SESSION["preorden"];
 		$items			= array();
+		$ceros			= false;
 
-		foreach ( $preorden as $i )
-			if( $i["idpvd"] == $idpvd && $i["en_oc"] ) $items[] = $i;
+		foreach ( $preorden as $i ){
+			if( $i["idpvd"] == $idpvd && $i["en_oc"] ) {
+				$items[] = $i;
+				if( $i["cant"] == 0 ) $ceros = true;
+			}
+		}
 		
-		return $items;
+		$data["registros"] = $items;
+		$data["cants_en0"] = $ceros;
+
+		return $data;
 	}
 	/* ----------------------------------------------------------------------------------- */
 	function obtenerPosicionItem( $idd, $idt ){
