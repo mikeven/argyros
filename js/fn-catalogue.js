@@ -74,7 +74,7 @@
     elementop.idp           = $(datos).attr("data-idp");
     elementop.nombre        = $(datos).attr("data-nombre");
     elementop.imagen        = $(datos).attr("data-img");
-    elementop.descripcion   = $(datos).attr("data-desc");
+    elementop.descripcion   = $(datos).attr("data-descripcion");
 
     return elementop;
  }
