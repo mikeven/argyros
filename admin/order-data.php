@@ -259,7 +259,12 @@
                                     <div class="clearfix"></div>
                                   </div>
                                   <div class="x_content">
-                                    <?php include( "sections/tables/table-order-details.php" );?> 
+                                    <?php 
+                                        if ( $orden["en_revision"] )
+                                            include( "sections/tables/table-order-details-revision.php" );
+                                        else
+                                            include( "sections/tables/table-order-details.php" );
+                                    ?> 
                                     <?php include( "sections/modals/product-image.php" ); ?>
                                   </div>                                  
                                 
@@ -360,6 +365,12 @@
     
     <?php if ( $orden["estado"] == "confirmado" ) { ?>
         <script>iniciarBotonEntregado();</script>                    
+    <?php } ?>
+    <?php if ( $orden["en_revision"] ) { ?>
+        <script> 
+            mostrarOpcionesRevision();
+            calcularTotalOrdenPrevio(); 
+        </script>                    
     <?php } ?>
 
   </body>

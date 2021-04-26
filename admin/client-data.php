@@ -126,7 +126,10 @@
                   </div>
                   
                   <div class="x_content">
-                    
+                    <div class="form-group">
+                        <label class="control-label">ID: </label> 
+                        <?php echo $cliente["id"]; ?>
+                    </div>
                     <div class="form-group">
                         <label class="control-label">Cliente: </label> 
                         <?php echo $cliente["nombre"]." ".$cliente["apellido"]; ?>

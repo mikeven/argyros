@@ -12,6 +12,9 @@
     include( "fn/fn-purchase.php" );
     include( "database/data-products.php" );
     checkSession( '' );
+    
+    if( !in_array( $uargyros["id"], array( 1, 2, 7, 16, 18 ) ) )
+        header('Location: home.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">

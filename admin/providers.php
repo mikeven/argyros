@@ -9,6 +9,9 @@
     include( "database/data-user.php" );
     include( "database/data-providers.php" );
     checkSession( '' );
+    
+    if( !in_array( $uargyros["id"], array( 1, 2, 7, 16, 18 ) ) )
+        header('Location: home.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
