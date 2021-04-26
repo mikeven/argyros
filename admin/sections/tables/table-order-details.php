@@ -77,37 +77,38 @@
           <div align="left" title="Ubicación"><i class="fa fa-archive"></i> <?php echo $r["ubicacion"]; ?></div>
         </td>
         
-        <td id="qcd<?php echo $r["id"]; ?>" align="center">
-          <?php echo $r["quantity"]; ?>
+        <td id="qcd<?php echo $r['id']; ?>" align="center">
+          <?php echo $r["quantity"]; //Cantidad solicitada ?>
         </td>
         
         <td class="dcol">
 
-          <input id="cd<?php echo $r["id"]; ?>" name="cant" class="qdisp_orden" type="text" disabled 
+          <input id="cd<?php echo $r['id']; ?>" name="cant" class="qdisp_orden" type="text" disabled 
           onKeyPress="return isIntegerKey(event);">
 
           <input id="pesoi<?php echo $r['id'] ?>" type="hidden" value="<?php echo $r['peso']; ?>">
           
-          <input class="qini" id="qocd<?php echo $r["id"]; ?>" type="hidden" 
-          data-ti="ti<?php echo $r["id"]; ?>" value="<?php echo $r["quantity"]; ?>">
+          <input class="qini" id="qocd<?php echo $r['id']; ?>" type="hidden" 
+          data-ti="ti<?php echo $r['id']; ?>" value="<?php echo $r['quantity']; ?>">
           
-          <input id="vacd<?php echo $r["id"]; ?>" type="hidden" value="0">
+          <input id="vacd<?php echo $r['id']; ?>" type="hidden" value="0">
 
-          <input id="rrcd<?php echo $r["id"]; ?>" name="regrev[]" type="hidden" value="0">
+          <input id="rrcd<?php echo $r['id']; ?>" name="regrev[]" type="hidden" value="0">
 
         </td>
         <?php if ( $orden["estado"] == "revisado" || $orden["estado"] == "confirmado" || $orden["estado"] == "entregado" ) { ?>
-          <td align="center"> <b> <?php echo $r["disponible"]; ?> </b> </span>
+          <td align="center"> 
+            <b> <?php echo $r["disponible"]; ?> </b> </span>
           </td>
         <?php } ?>
         <td align="right">
-          $<span id="mntqocd<?php echo $r["id"]; ?>"> <?php echo $r["price"]; ?> </span>
+          $<span id="mntqocd<?php echo $r['id']; ?>"> <?php echo $r["price"]; ?> </span>
         </td>
         <td align="right">
-          $<span id="ti<?php echo $r["id"]; ?>"> <?php echo $total_item; ?> </span>
+          $<span id="ti<?php echo $r['id']; ?>"> <?php echo $total_item; ?> </span>
         </td>
         <td align="right">
-          <span id="tpi<?php echo $r["id"]; ?>"> <?php echo $tot_peso_item; ?> </span>gr
+          <span id="tpi<?php echo $r['id']; ?>"> <?php echo $tot_peso_item; ?> </span>gr
         </td>
         
         <td align="center" class="dcol">
@@ -125,13 +126,13 @@
         
         <?php if ( $orden["procesada"] ) { ?>
           <td align="center">
-            <i class="fa fa-check <?php echo activarIconoRevision( $r["revision"], "disp" ); ?>" title="Disponible"></i>
+            <i class="fa fa-check <?php echo activarIconoRevision( $r['revision'], "disp" ); ?>" title="Disponible"></i>
           </td>
           <td align="center">
-            <i class="fa fa-times <?php echo activarIconoRevision( $r["revision"], "nodisp" ); ?>" title="No disponible"></i>
+            <i class="fa fa-times <?php echo activarIconoRevision( $r['revision'], "nodisp" ); ?>" title="No disponible"></i>
           </td>
           <td align="center">
-            <i class="fa fa-exclamation <?php echo activarIconoRevision( $r["revision"], "modif" ); ?>" title="Cantidad modificada"></i>
+            <i class="fa fa-exclamation <?php echo activarIconoRevision( $r['revision'], "modif" ); ?>" title="Cantidad modificada"></i>
           </td>
         <?php } ?>
 

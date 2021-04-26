@@ -11,17 +11,25 @@
   <tbody>
     <?php 
       foreach ( $movimientos as $m ) {
-        if( $m["tipo_movimiento"] == "oc" )
+        if( $m["tipo_movimiento"] == "oc" ){
           $lnk = "purchase-data.php?purchase-id=$m[id]";
+        }
         if( $m["tipo_movimiento"] == "pedido" )
           $lnk = "order-data.php?order-id=$m[id]"; 
     ?>
-    <tr>
-      <td ><?php echo $m["fcreacion"]; ?></td>
-      <td><a href="<?php echo $lnk ?>" target="_blank"><?php echo $m["movimiento"]; ?></a></td>
-      <td><?php echo $m["cliente_proveedor"]; ?></td>
-      <td><?php echo $m["cant"]; ?></td>
-    </tr>
-    <?php } ?>
+        <tr>
+          <td><?php echo $m["fcreacion"]; ?></td>
+          <?php if( in_array( $uargyros["id"], array( 1, 2, 7, 16, 18 ) ) && $m["tipo_movimiento"] == "oc" 
+                                                                    || $m["tipo_movimiento"] == "pedido" ) { ?>
+            <td><a href="<?php echo $lnk ?>" target="_blank"><?php echo $m["movimiento"]; ?></a></td>
+          <?php } else { ?>
+            <td><?php echo $m["movimiento"]; ?></td>
+          <?php } ?>
+          <td><?php echo $m["cliente_proveedor"]; ?></td>
+          <td><?php echo $m["cant"]; ?></td>
+        </tr>
+    <?php 
+      
+      } ?>
   </tbody>
 </table>
