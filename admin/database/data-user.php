@@ -346,5 +346,6 @@
 		
 		echo json_encode( $res );	
 	}
-
+	if( isset( $_SESSION["user-adm"] ) )
+		$uargyros = $_SESSION["user-adm"];
 ?>

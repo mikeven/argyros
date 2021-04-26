@@ -77,20 +77,36 @@
 		return $tpeso;
 	}
 	/* ----------------------------------------------------------------------------------- */
+	function ordenEnRevision( $orden, $detalle ){
+		// Devuelve si una orden está en revisión  (estado: pendiente y al menos un detalle revisado)
+		$en_revision = false;
+
+		if( $orden["estado"] == "pendiente" ){
+			foreach ( $detalle as $i ) {
+				if( $i["revision"] != NULL ) $en_revision = true;	
+			}
+		}
+
+		return $en_revision;
+	}
+	/* ----------------------------------------------------------------------------------- */
 	function obtenerOrdenActualizada( $orden, $detalle ){
 		//Devuelve los datos actualizados de una orden dependiendo del estado
-		$orden["procesada"] = false;
+		$orden["procesada"] 	= false;
+
 		if ( ( $orden["estado"] != "pendiente" ) && ( $orden["estado"] != "cancelado" ) ){
-			$orden["procesada"] = true;
+			$orden["procesada"] 		= true;
 			$orden["total_actualizado"] = calcularMontoPedido( $detalle, $orden["estado"] );
 		}else{
 			$orden["total_actualizado"] = $orden["total"];
-			$orden["ncant_items"] = obtenerNumeroCantidadItems( $detalle, $orden["estado"] );
+			$orden["ncant_items"] 		= obtenerNumeroCantidadItems( $detalle, $orden["estado"] );
 		}
 
 		if( ( $orden["estado"] == "revisado" ) || ( $orden["estado"] == "confirmado" ) || ( $orden["estado"] == "entregado" ) ){
-			$orden["ncant_items"] = obtenerNumeroCantidadItems( $detalle, $orden["estado"] );	
+			$orden["ncant_items"] 		= obtenerNumeroCantidadItems( $detalle, $orden["estado"] );	
 		}
+
+		$orden["en_revision"] 			= ordenEnRevision( $orden, $detalle ); 
 		
 		return $orden;
 	}
@@ -110,7 +126,7 @@
         
         if( $data_o["orden"] ){
 	        $dorden 		= $data_o["detalle"];
-	        $orden 			= obtenerOrdenActualizada( $data_o["orden"], $dorden );
+	        $orden 			= obtenerOrdenActualizada( $data_o["orden"], $dorden );        
 	        $iconoe 		= obtenerIconoEstado( $orden["estado"], "fa-2x" );
 	        $orden["tpeso"]	= obtenerPesoTotalOrden( $data_o["orden"], $dorden );
     	}

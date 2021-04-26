@@ -65,13 +65,15 @@ function calcularTotalOrdenPrevio(){
     mostrarMontoPrevio( monto, peso_total );
 }
 /* --------------------------------------------------------- */
-function asignarValorRegistro( status_rev, id ){
+function asignarValorRegistro( status_rev, id, registrar ){
 	//Asigna los valores para conformar un registro ( id_registro, cantidad, accion )
 	var idr = id.substring(2);				//cdxx substring(2):xx
 	var cant = $( "#" + id ).val();
 	$( "#rr" + id ).val( idr + "," + cant + "," + status_rev );
 	$( "#qo" + id ).val( cant );
-	//alert(idr + "," + cant + "," + status_rev);
+	
+	if( status_rev != "modif" || ( status_rev == "modif" && registrar && cant != "" ) )
+		registrarRevisionItem( idr, cant, status_rev );
 }
 /* --------------------------------------------------------- */
 function accionCantidad( accion, trg ){
@@ -97,8 +99,7 @@ function accionCantidad( accion, trg ){
 	}
 	var srev = $(accion).attr("data-sr");		//Status de revisión
 	
-	//if( $(accion).attr("data-c") != "*" )
-		asignarValorRegistro( srev, trg );
+	asignarValorRegistro( srev, trg, false );
 
 }
 /* --------------------------------------------------------- */
@@ -134,6 +135,24 @@ function enviarRevisionPedido(){
 				notificar( tit_notif, res.mje, "success" );
 				location.reload();
 			}else{
+				notificar( tit_notif, res.mje, "error" );
+			}
+        }
+    });	
+}
+/* --------------------------------------------------------- */
+function registrarRevisionItem( idr, cant, status_rev ){
+	//Invoca al servidor para enviar revisión de un ítem de pedido
+	
+	$.ajax({
+        type:"POST",
+        url:"database/data-orders.php",
+        data:{ rev_item_ped: idr, cant: cant, revision: status_rev },
+        
+        success: function( response ){
+        	console.log(response);
+			res = jQuery.parseJSON(response);
+			if( res.exito == 1 ){ }else{
 				notificar( tit_notif, res.mje, "error" );
 			}
         }
@@ -208,10 +227,15 @@ function chequearRevisionConfirmacion(){
 		$("#cnf_pedido").fadeOut(600);
 }
 /* --------------------------------------------------------- */
+function mostrarOpcionesRevision(){
+	// Activa visualmente los elementos para revisar un pedido
+	$(".dcol").fadeToggle( "slow", "linear" );
+}
+/* --------------------------------------------------------- */
 $( document ).ready( function() {
     //Clic: Inicia la tabla de revisión de pedido
     $('#r_pedido').on('click', function() {
-	    $(".dcol").fadeToggle( "slow", "linear" );
+    	mostrarOpcionesRevision();
 	});	
 
 	$("#cnf_pedido").hide();
@@ -226,7 +250,7 @@ $( document ).ready( function() {
     //Clic: Acción dada por los íconos de revisión de pedido
 	$('.i-rev').on('click', function() {
 	    var trg = $(this).attr("data-t");		//cdxx
-	    $("." + trg ).removeClass("marked");
+	    $("." + trg ).removeClass("marked");	// Quitar marca de selección azul a los 3 íconos
 	    accionCantidad( $(this), trg );
 	    $(this).addClass("marked");
 	    calcularTotalOrdenPrevio();
@@ -237,7 +261,7 @@ $( document ).ready( function() {
 	$('.qdisp_orden').on('blur', function() {
 	    var id = $(this).attr("id");			//cdxx
 	    var status_rev = $( "#i" + id ).attr("data-sr");
-	    asignarValorRegistro( status_rev, id );
+	    asignarValorRegistro( status_rev, id, true );
 	    calcularTotalOrdenPrevio();
 	});
 
@@ -246,7 +270,7 @@ $( document ).ready( function() {
 	//Clic: Chequeo de la revisión de pedido
 	$('#resp_pedido').on('click', function(){
 		var r = validarRevisionPedido();
-		if( r == false ) notificar( "Error", "Debe chequear respuesta", "error" );
+		if( r == false ) notificar( "Error", "Faltan ítems del pedido por revisar", "error" );
 		if( r == true ){
 			enviarRevisionPedido();
 		} 

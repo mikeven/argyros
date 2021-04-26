@@ -144,18 +144,18 @@
 			$datap = obtenerDataProductoIdDetalle( $dbh, $id_detalle_orden );
 			actualizarDisponibilidadTallaProducto( $dbh, $datap["product_detail_id"], $datap["size_id"], 0 );
 			actualizarFechaNoDisponibilidad( $dbh, $datap["product_detail_id"] );
-			actualizarDisponibilidadProductoPorAjuste( $dbh, $datap["product_id"] );
+			//actualizarDisponibilidadProductoPorAjuste( $dbh, $datap["product_id"] );
 		}
 	}
 	/* ----------------------------------------------------------------------------------- */
 	function registrarRevisionPedido( $dbh, $revision ){
 		//Recorre el vector de registros de detalle de pedido (id, cant) para enviar a BD
-		$res = 0;
+		$res = 1;
 		include( "data-products.php" );
 		if( count( $revision ) > 0 ){
 			foreach ( $revision as $r ){
 				list( $id, $cant, $srev ) = explode( ',', $r );
-				$res += actualizarDetallePedidoRevision( $dbh, $id, $cant, $srev );
+				//$res += actualizarDetallePedidoRevision( $dbh, $id, $cant, $srev );
 				ajustarDisponibilidadProducto( $dbh, $cant, $id );
 			}
 		}
@@ -204,18 +204,39 @@
 		if ( ( $idr != 0 ) && ( $idr != "" ) ){
 			actualizarNotaRevisionPedido( $dbh, $_POST["idp"], $revision["nota_revision"] );
 			actualizarEstadoPedido( $dbh, $_POST["idp"], "revisado", "no-leido" );
-			$renvio = notificarActualizacionPedido( $dbh, "pedido_revisado", $_POST["idp"], 
-													$_POST["monto_orden"] );
+			$renvio = notificarActualizacionPedido( $dbh, "pedido_revisado", $_POST["idp"], $_POST["monto_orden"] );
+			
 			if( $renvio["exito"] == 1 ){
 				$res["exito"] = 1;
 				$res["mje"] = "La respuesta del pedido ha sido enviada";
 			}else{
 				$res["exito"] = -2;
-				$res["mje"] = "Error al enviar notificación por email: $res[msg]";
+				$res["mje"] = "Error al enviar notificación por email: ".$renvio["msg"];
 			}
 		} else {
 			$res["exito"] = -2;
 			$res["mje"] = "Error al actualizar pedido";
+		}
+
+		echo json_encode( $res );
+	}
+	/* ----------------------------------------------------------------------------------- */
+	//Registrar revisión de ítem de pedido
+	if( isset( $_POST["rev_item_ped"] ) ){
+		include( "bd.php" );
+		ini_set( 'display_errors', 1 );
+
+		$iditem 	= $_POST["rev_item_ped"];
+		$cantidad 	= $_POST["cant"];
+		$revision 	= $_POST["revision"];
+		
+		$idr = actualizarDetallePedidoRevision( $dbh, $iditem, $cantidad, $revision );
+		
+		if ( ( $idr != 0 ) && ( $idr != "" ) ){
+			$res["exito"] = 1;
+		} else {
+			$res["exito"] = -2;
+			$res["mje"] = "Error al actualizar ítem";
 		}
 
 		echo json_encode( $res );

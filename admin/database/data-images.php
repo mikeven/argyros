@@ -60,7 +60,7 @@
 
 		$nva 				= imagecreatetruecolor( $nw, $nh+10 ); 						// Creación de nueva imagen	
 		$color_1 			= imagecolorallocate( $nva, 0, 0, 0 );						// Color negro
-		$color_2 			= imagecolorallocatealpha( $nva, 167, 178, 57, 0 );		// Color blanco
+		$color_2 			= imagecolorallocatealpha( $nva, 255, 255, 255, 10 );		// Color blanco
 
 		$x1 = 0; 	$x2 = $nw;
 		$y1 = $nh; 	$y2 = $nh - $ai;

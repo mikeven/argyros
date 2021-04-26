@@ -241,19 +241,19 @@
 		
 		$resultados = $registros;
 
-		if( isset( $form["tallas"] ) && count( $form["tallas"] ) > 0 ){								// Filtrar por tallas
+		if( isset( $form["tallas"] ) && count( $form["tallas"] ) > 0 ){		// Filtrar por tallas
 			$resultados = filtrarProductosTalla( $registros, $form );	
 		}
 
-		if( $form["peso_min"] != "" || $form["peso_max"] != "" ){		// Filtrar por peso
+		if( $form["peso_min"] != "" || $form["peso_max"] != "" ){			// Filtrar por peso
 			$resultados = filtrarProductosPeso( $registros, $form );	
 		}
 
-		if( $form["prepza_min"] != "" || $form["prepza_max"] != "" ){	// Filtrar por precio (pieza)
+		if( $form["prepza_min"] != "" || $form["prepza_max"] != "" ){		// Filtrar por precio (pieza)
 			$resultados = filtrarProductosPrecio( $resultados, $form, "pieza" );	
 		}
 
-		if( $form["prepes_min"] != "" || $form["prepes_max"] != "" ){	// Filtrar por precio (peso, MO)
+		if( $form["prepes_min"] != "" || $form["prepes_max"] != "" ){		// Filtrar por precio (peso, MO)
 			$resultados = filtrarProductosPrecio( $resultados, $form, "peso" );		
 		}
 
@@ -356,6 +356,16 @@
 		return $sq;
 	}
 	/* ----------------------------------------------------------------------------------- */
+	function obtenerSubQueryProductosDesuso( $form ){
+		// Devuelve el subquery para filtrar proveedor
+		$desuso = "is null";
+		if( isset( $form["desuso"] ) ) $desuso = " = 1";
+
+		$sq = "and dp.disused $desuso";
+
+		return $sq;
+	}
+	/* ----------------------------------------------------------------------------------- */
 	function obtenerSubQueryFechas( $campo, $rango_fechas ){
 		// Devuelve el subquery para filtrar búsqueda en un rango de fechas
 		
@@ -388,6 +398,7 @@
 		$q_kw	= "";	//sub-query: palabras claves
 		$q_fr	= "";	//sub-query: fecha reposición
 		$q_prv	= "";	//sub-query: proveedor
+		$q_dsu	= "";	//sub-query: productos en desuso
 
 		$idc 	= $form["categoria"];
 		$idsc 	= $form["subcategoria"];
@@ -398,6 +409,8 @@
 		$q_m 	= obtenerSubQueryValorUnico( "p.material_id", $form["material"] );
 
 		$q_prv 	= obtenerSubQueryProveedor( $form["proveedor"] );
+
+		$q_dsu 	= obtenerSubQueryProductosDesuso( $form );
 
 		if( $form["subcategoria"] != "todos" )
 			$q_sc = obtenerSubQueryValorUnico( "p.subcategory_id", $form["subcategoria"] );
@@ -431,7 +444,7 @@
 		$query 	= "select p.id, p.code, p.name, p.description, p.visible, dp.id as id_det $idt  
 					from products p, $t_spd $t_mp $t_lp product_details dp 
 					where p.category_id = $idc $q_sc $q_pa $q_m $q_prv $q_l $q_t $q_kw $q_fr 
-					and dp.product_id = p.id $qdet";
+					and dp.product_id = p.id $qdet $q_dsu";
 		//echo $query;
 
 		return $query;
