@@ -155,7 +155,7 @@
 
 		$cart 		= ""; 		$lpag 		= ""; 
 		$ni 		= 0; 		$total_cart = 0.00; 	$total_cant = 0;
-		$carrito 	= NULL;		$ck_cart 	= NULL;
+		$carrito 	= array();
 
 		if( isset( $_SESSION["cart"] ) ){
 			
@@ -166,15 +166,15 @@
 			if( $param != "" )
 				guardarEstadoCarrito( $carrito, "" );
 		}
-		
+
 		foreach ( $carrito as $item ) {
 			
-			$content_item_dsp = escribirItem( $ni, $plantilla_item_dsp, $item );
-			$content_item_pag = escribirItem( $ni, $plantilla_item_pag, $item );
-			$cart .= $content_item_dsp;
-			$lpag .= $content_item_pag; 
-			$total_cart += obtenerTotalItem( $item );
-			$total_cant += $item["quantity"];  
+			$content_item_dsp 	= escribirItem( $ni, $plantilla_item_dsp, $item );
+			$content_item_pag 	= escribirItem( $ni, $plantilla_item_pag, $item );
+			$cart 				.= $content_item_dsp;
+			$lpag 				.= $content_item_pag; 
+			$total_cart 		+= obtenerTotalItem( $item );
+			$total_cant 		+= $item["quantity"];  
 			$ni++; 
 		}
 
@@ -211,10 +211,13 @@
 	/* ----------------------------------------------------------------------------------- */
 	function actualizarContenidoCarritoArchivo(){
 		//Actualiza el contenido del carrito desde la carga del archivo previamente guardado
-
+		$filecart			= "[]";
 		$filename 			= PFXCARTFILE.$_SESSION["user"]["id"];
+		$ruta_archivo		= "ckfiles/".$filename.".json";
 
-		$filecart 			= file_get_contents( "ckfiles/".$filename.".json" );
+		if( file_exists( $ruta_archivo ) )
+			$filecart 			= file_get_contents( $ruta_archivo );
+		
 		$_SESSION["cart"] 	= json_decode( $filecart, true );
 	}
 	/* ----------------------------------------------------------------------------------- */

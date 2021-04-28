@@ -46,7 +46,7 @@ function obtenerCarritoCompra( accion ){
         url:"fn/fn-cart.php",
         data:{ get_cart: 1, param: accion },
         success: function( response ){
-            //console.log(response);
+            console.log(response);
             cart = jQuery.parseJSON( response );
             /*if( accion == 'agregar' )
                 registrarInicioCarrito();*/

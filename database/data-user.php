@@ -131,24 +131,22 @@
 		return mysqli_insert_id( $dbh );
 	}
 	/* ----------------------------------------------------------------------------------- */
-	function obtenerUsuarioLogin( $lnk, $email, $pass ){
+	function obtenerUsuarioLogin( $dbh, $email, $pass ){
 		//Obtiene los datos de un usuario por email y contraseña
-		$sql = "select * from clients where email = '$email' and password='$pass'";
-		
-		$data = mysqli_query ( $lnk, $sql );		
-		$data_user = mysqli_fetch_array( $data );
+		$q = "select * from clients where email = '$email' and password='$pass'";
 
-		return $data_user;
+		return mysqli_fetch_array( mysqli_query ( $dbh, $q ) );
 	}
 	/* ----------------------------------------------------------------------------------- */
 	function sesionUsuarioBloqueado( $dbh ){
 		//Devuelve verdadero si el usuario en sesión activa está bloqueado
 		$bloqueado = false;
-
-		$usuario = obtenerUsuarioSesion( $dbh );
-		if( $usuario && $usuario["blocked"] == 1 ) 
-			$bloqueado = true;
 		
+		if( isset($_SESSION["user"] ) ){
+			$usuario = obtenerUsuarioSesion( $dbh );
+			if( $usuario && $usuario["blocked"] == 1 ) 
+				$bloqueado = true;
+		}
 		return $bloqueado;
 	}
 	/* ----------------------------------------------------------------------------------- */
@@ -321,10 +319,13 @@
 	/* ----------------------------------------------------------------------------------- */
 	function cargarContenidoCarritoArchivo(){
 		//Obtiene el contenido del carrito previamente guardado y lo carga en la variable de sesión
-
+		$filecart			= "[]";
 		$filename 			= PFXCARTFILE.$_SESSION["user"]["id"];
-
-		$filecart 			= file_get_contents( "../fn/ckfiles/".$filename.".json" );
+		$ruta_archivo		= "../fn/ckfiles/".$filename.".json";
+		
+		if( file_exists( $ruta_archivo ) )
+			$filecart 		= file_get_contents( $ruta_archivo );
+		
 		$_SESSION["cart"] 	= json_decode( $filecart, true );
 	}
 	/* ----------------------------------------------------------------------------------- */
@@ -378,10 +379,11 @@
 	/* ----------------------------------------------------------------------------------- */
 	//Cierre de sesión
 	if( isset( $_GET["logout"] ) ){
-		//include( "bd.php" );
+		
 		unset( $_SESSION["login"] );
 		unset( $_SESSION["user"] );
 		unset( $_SESSION["cart"] );
+		session_destroy();
 		echo "<script> window.location = 'index.php'</script>";		
 	}	
 	/* ----------------------------------------------------------------------------------- */

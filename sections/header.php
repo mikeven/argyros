@@ -44,13 +44,13 @@
 <header id="top" class="clearfix">
 	
 	<!-- Navigation -->
-	<?php include("navigation.php"); ?>
+	<?php include( "navigation.php" ); ?>
 	<!-- /.Navigation -->
 	
 	<div class="line"></div>
 
 	<!-- Top -->
-	<?php include("main-top.php"); ?>
+	<?php include( "main-top.php" ); ?>
 	<!--/.Top -->
 	
 	<!-- Facebook Conversion Code for Themes -->

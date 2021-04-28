@@ -1,10 +1,8 @@
 <?php
 	/* Argyros - Conexión a base de datos */
 	/* ----------------------------------------------------------------------------------- */
-	/*$servidor = "127.0.0.1";
-	$usuariobd = "root";
-	$passbd = "";
-	$basedatos = "dbargyros";*/
+	/*
+	*/
 
 	$servidor = "127.0.0.1";
 	$usuariobd = "argyrosa_bd";
