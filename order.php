@@ -166,6 +166,8 @@
 		#items_retirados{ padding-top: 16px; }
 		.iretirados{ background-color: #f3dada; }
 
+		.leyenda_pedido{ padding: 12px 0; font-size: 13.5px; }
+
 	</style>
 </head>
 

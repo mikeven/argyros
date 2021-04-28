@@ -48,8 +48,8 @@
 	      <td>$<?php echo $r["price"]; ?></td>
 	      <td style="text-align: right;">
 	      	$<?php echo number_format( $total_item, 2, ".", " " ); ?>
-	      	<input type="hidden" id="monto<?php echo $r["id"]; ?>" value="<?php echo $total_item; ?>">
-	      	<input class="sumatmp" type="hidden" id="montotmp<?php echo $r["id"]; ?>" value="<?php echo $total_item; ?>">
+	      	<input type="hidden" id="monto<?php echo $r['id']; ?>" value="<?php echo $total_item; ?>">
+	      	<input class="sumatmp" type="hidden" id="montotmp<?php echo $r["id"]; ?>" value="<?php echo $total_item ?>">
 	      </td>
 	      
 	      <td><?php echo number_format( $tot_peso_item, 2, ".", " " ) ?> gr</td>

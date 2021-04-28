@@ -23,7 +23,7 @@
 	      	$item_nro++;
 	        
 	        $total_item = $r["cant_rev"] * $r["price"];
-	        $tot_peso_item 	= obtenerTotalPesoItemOrden( $r, $orden["estado"] );
+	        $tot_peso_item = obtenerTotalPesoItemOrden( $r, $orden["estado"] );
 
 	        $lnk_p = "product.php?id=$r[product_id]&iddet=$r[product_detail_id]";
 	        $cod_dp = "#" . $r["product_id"] . " - " . $r["product_detail_id"];
@@ -37,8 +37,13 @@
 	        if( ( $r["cant_rev"] != 0 ) && ( $r["item_status"] != "retirado" ) ){
 	        	$total_n_items += $r["cant_rev"];
 
+	        $cantidad_ = $r["cant_rev"];
+
+	        if( $r["cant_rev"] < $r["quantity"] ) 
+	        	$cantidad_ = $r["quantity"]."(<span style='color: red'>".$r["cant_rev"]."</span>)";
+
 	    ?>
-	    <tr id="ir<?php echo $r["id"]; ?>">
+	    <tr id="ir<?php echo $r['id']; ?>">
 	      <td align="center"><?php echo $item_nro ?></td>
 	      <td>
 	      	<a href="#pop-img" class="fancybox pop-img" data-src="<?php echo $purl.$r["imagen"]; ?>">
@@ -52,7 +57,7 @@
 	      	</a>
 	      	<div align="left"><span class="detlist-id-det"><?php echo $cod_dp; ?></span></div>
 	      </td>
-	      <td align="center"><?php echo $r["cant_rev"]; ?></td>
+	      <td align="center"><?php echo $cantidad_; ?></td>
 	      <td>$<?php echo $r["price"]; ?></td>
 	      <td>$<?php echo $total_item; ?></td>
 	      <td><?php echo number_format( $tot_peso_item, 2, ".", " " ) ?> gr</td>
@@ -73,7 +78,7 @@
 	    	</td>
 	    	<td class="coltotales"> 
 	    		<span id="total_order_cant" class="total_order_table">
-	    			<?php echo number_format( $orden["tpeso"], 2, ".", "" )?>
+	    			<?php echo number_format( $orden["tpeso"], 2, ".", "" ) ?>
 	    		</span> gr
 	    	</td>
 	    </tr>
@@ -88,3 +93,7 @@
 	if( count( $items_retirados ) > 0 ) 
 		include( "table-retired-items.php" ); 
 ?>
+<hr>
+<div class="leyenda_pedido"> 
+	 A: Cantidad solicitada   (<span style='color: red'>B</span>): Cantidad disponible
+</div>
