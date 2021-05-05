@@ -374,10 +374,19 @@
 	function registrosAsociadosTallaDetalle( $dbh, $iddet, $idtalla ){
 		//Determina si existe un registro de alguna tabla asociada a una talla de detalle producto
 		//Tablas relacionadas: order_details
+		$asociaciones = false;
 		include( "data-system.php" );
 
-		return registroAsociadoTabla2P( $dbh, "order_details", "product_detail_id", $iddet, 
-															   "size_id", $idtalla );
+		$asociado_pedidos 	= registroAsociadoTabla2P( $dbh, "order_details", "product_detail_id", $iddet, 
+														   "size_id", $idtalla );
+
+		$asociado_oc 		= registroAsociadoTabla2P( $dbh, "purchase_details", "product_detail_id", $iddet, 
+													   "size_id", $idtalla );
+
+		if( $asociado_pedidos || $asociado_oc ) 
+			$asociaciones 	= true;
+		
+		return $asociaciones;
 	} 
 	/* ----------------------------------------------------------------------------------- */
 	function eliminarTallaDetalleProducto( $dbh, $iddet, $idtalla ){
@@ -983,7 +992,7 @@
 			}
 			if( $data_e["exito"] == -2 ){
 				$res["exito"] = $data_e["exito"];
-				$res["mje"] = "Existen tallas asociadas a pedidos: ".$data_e["t_asoc"];
+				$res["mje"] = "Tallas asociadas a pedidos/OC: ".$data_e["t_asoc"];
 			}
 		}
 
