@@ -115,10 +115,10 @@ function validarRevisionPedido(){
 /* --------------------------------------------------------- */
 function enviarRevisionPedido(){
 	//Invoca al servidor para enviar revisión de pedido
-	var tit_notif = "Revisión de pedido"
-	var form_rev = $("#revision_pedido").serialize();
-	var ido = $("#idpedido").val();
-	var monto = $("#previo_total_orden").val();
+	var tit_notif 	= "Revisión de pedido"
+	var form_rev 	= $("#revision_pedido").serialize();
+	var ido 		= $("#idpedido").val();
+	var monto 		= $("#previo_total_orden").val();
 	
 	$.ajax({
         type:"POST",
@@ -161,14 +161,15 @@ function registrarRevisionItem( idr, cant, status_rev ){
 /* --------------------------------------------------------- */
 function actualizarPedido( estado ){
 	//Invoca al servidor para actualizar un pedido: Cambio de estatus
-	var tit_notif = "Actualización de pedido";
-	var ido = $("#idpedido").val();
+	var tit_notif 	= "Actualización de pedido";
+	var ido 		= $("#idpedido").val();
 	var observacion = $("#admin_obs").val();
+	var post_rev	= $("#post_rev").val();
 
 	$.ajax({
         type:"POST",
         url:"database/data-orders.php",
-        data:{ conf_ped: ido, status: estado, nota:observacion },
+        data:{ conf_ped: ido, status: estado, nota:observacion, post_r: post_rev },
         beforeSend: function () {
             $("#res_serv").html("<img src='images/ajax-loader.gif' width='16' height='16'>");
         },
@@ -209,6 +210,10 @@ function iniciarBotonConfirmacion(){		//order-data.php
 						 "Confimar" );	
 }
 /* --------------------------------------------------------- */
+function mostrarBotonConfirmarPedido(){
+	$("#cnf_pedido").fadeIn(600);
+}
+/* --------------------------------------------------------- */
 function chequearRevisionConfirmacion(){
 	//Chequea todos los ítems de un pedido en revisión para mostrar el botón de confirmación
 	//Si todos los ítems están disponibles, se habilita la posibilidad de confirmar el pedido
@@ -222,7 +227,7 @@ function chequearRevisionConfirmacion(){
 	});
 
 	if ( confirmable == true )
-		$("#cnf_pedido").fadeIn(600);
+		mostrarBotonConfirmarPedido();
 	else
 		$("#cnf_pedido").fadeOut(600);
 }
@@ -238,7 +243,7 @@ $( document ).ready( function() {
     	mostrarOpcionesRevision();
 	});	
 
-	$("#cnf_pedido").hide();
+	//$("#cnf_pedido").hide();
 
 	$(".pop-img-p").on( "click", function(){
     	var img = $(this).attr("data-src");

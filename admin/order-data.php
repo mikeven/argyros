@@ -58,7 +58,7 @@
         <link href="build/css/custom.min.css" rel="stylesheet">
 
         <style type="text/css">  
-            .dcol{ display: none; }
+            .dcol, #cnf_pedido{ display: none; }
             #datatable_do .dcol .fa:hover{ cursor: pointer; }
             .marked{ color: #5bc0de; }
             .item_retirado{ background: #f9c7c6; } .iley_dsp{ color: #f9c7c6; }
@@ -127,115 +127,9 @@
                                   
                                     <div class="x_content">
                                         
-                                        <div class="form-group">
-                                            <label class="control-label">Pedido: </label> <?php echo "#".$orden["id"]; ?>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="control-label">Fecha: </label> <?php echo $orden["fecha_hora"]; ?>
-                                        </div>
+                                        <?php include( "sections/orders/order-info.php" ) ?>
 
-                                        <div class="form-group">
-                                            <label class="control-label">Ítems: </label> <?php echo $orden["ncant_items"]; ?>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="control-label">Peso total estimado: </label> 
-                                            <span id="peso_total_orden">
-                                                <?php echo number_format( $orden["tpeso"], 2, ".", " " ); ?>
-                                            </span> gr
-                                            <input type="hidden" id="previo_peso_orden" value="<?php echo $orden['tpeso']; ?>">
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="control-label">Total estimado: </label> 
-                                            $<span id="monto_total_orden"><?php echo $orden["total_actualizado"]; ?></span>
-                                            <input type="hidden" id="previo_total_orden" value="<?php echo $orden["total"]; ?>">
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="control-label">Estado: </label> <?php echo $orden["estado"]; ?>
-                                        </div>
-                                        <?php if ( $orden["procesada"] ) {?>
-                                            <div class="form-group">
-                                                <span>Monto inicial: $<?php echo $orden["total"]; ?></span>   
-                                            </div> 
-                                        <?php } ?>
-                                        <hr>
-
-                                        <?php if( $orden["nota_compra_cliente"] != "" ) { ?>
-                                            <div><b>Nota del cliente: </b></div>
-                                            <div><?php echo $orden["nota_compra_cliente"]?> </div>
-                                        <?php } ?>
-
-                                        <?php if( $orden["estado"] == "revisado" ) { ?>
-                                            <div><b>Observaciones de revisión: </b></div>
-                                            <div><?php echo $orden["revision_note"]?> </div>
-                                        <?php } ?>
-
-                                        <?php if( $orden["estado"] == "confirmado" || $orden["estado"] == "entregado" ) { ?>
-                                            <div><b>Observaciones del cliente: </b></div>
-                                            <div><?php echo $orden["client_note"]?> </div>
-                                        <?php } ?>
-
-                                        <?php if( $orden["estado"] == "entregado" ) { ?>
-                                            <div><b>Observaciones del administrador: </b></div>
-                                            <div><?php echo $orden["admin_note"]?> </div>
-                                        <?php } ?>
-
-                                        <hr>
-                                        <div class="form-group">
-                                            <label class="control-label">Cliente: </label> 
-                                            <a href="client-data.php?id=<?php echo $orden['cid'] ?>" target="_blank">
-                                                <?php echo "#".$orden["cid"]; ?>
-                                                <?php echo $orden["nombre"]." ".$orden["apellido"]; ?>
-                                            </a>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="control-label">Grupo cliente: </label> 
-                                            <?php echo $orden["grupo_cliente"]; ?>
-                                        </div>
-
-                                        <?php if ( $orden["estado"] == "pendiente" ) { ?>
-                                        <hr>
-                                        <div class="form-group btn_accion_pedido">
-                                            <a href="#!">
-                                                <button id="r_pedido" type="button" class="btn btn-info btn-xs">Revisar</button>
-                                            </a> 
-                                        </div>
-
-                                        <div class="form-group btn_accion_pedido" style="margin-left:20px;">
-                                            <a href="#!">
-                                                <button id="cnf_pedido" type="button" 
-                                                class="btn btn-success btn-xs" data-toggle="modal" 
-                                                data-target="#confirmar-accion">Confirmar</button>
-                                            </a> 
-                                        </div>
-                                        <div class="form-group btn_accion_pedido" style="margin-left:20px;">
-                                            <a href="#!">
-                                                <button id="can_pedido" type="button" 
-                                                class="btn btn-danger btn-xs" data-toggle="modal" 
-                                                data-target="#confirmar-accion">Cancelar</button>
-                                            </a> 
-                                        </div>
-                                        
-                                        <?php } ?>
-                                        
-                                        <?php if ( $orden["estado"] == "confirmado" ) { ?>
-                                            <hr>
-
-                                            <div class="accion_observaciones">
-                                              <textarea id="admin_obs" class="form-control" rows="3" placeholder="Observaciones" name="observaciones"></textarea>
-                                            </div>
-
-                                            <div class="form-group btn_accion_pedido">
-                                                <a href="#!">
-                                                    <button id="e_pedido" type="button" 
-                                                    class="btn btn-info btn-xs" data-toggle="modal" 
-                                                    data-target="#confirmar-accion">Marcar como entregado</button>
-                                                </a> 
-                                            </div>
-                                            
-                                        <?php } ?>
+                                        <?php include( "sections/orders/order-actions.php" ) ?>
 
                                         <div id="res_serv"></div>
                                         <?php include( "sections/modals/confirm_action.php" ); ?>
@@ -366,6 +260,11 @@
     <?php if ( $orden["estado"] == "confirmado" ) { ?>
         <script>iniciarBotonEntregado();</script>                    
     <?php } ?>
+
+    <?php if ( $orden["estado"] == "revisado" ) { ?>
+        <script>mostrarBotonConfirmarPedido();</script>                    
+    <?php } ?>
+
     <?php if ( $orden["en_revision"] ) { ?>
         <script> 
             mostrarOpcionesRevision();

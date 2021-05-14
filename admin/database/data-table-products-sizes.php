@@ -44,7 +44,7 @@
 		date_format(dp.created_at,'%d/%m/%Y %h:%i:%s %p') as fcreado 
 		FROM product_details dp, products p, categories ca, subcategories sc 
 		WHERE dp.product_id = p.id and p.category_id = ca.id and p.subcategory_id = sc.id 
-		ORDER BY dp.unavailable_at DESC";
+		ORDER BY dp.unavailable_at DESC limit 500";
 		
 		$lista = obtenerListaRegistros( mysqli_query( $dbh, $q ) );
 		

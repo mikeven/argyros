@@ -37,7 +37,7 @@
 	/* ----------------------------------------------------------------------------------- */
 	function obtenerDetalleOrden( $dbh, $ido ){
 		//Devuelve los registros correspondientes a un detalle de pedido dado su id
-		$q = "select od.id, od.order_id, od.product_id, od.product_detail_id, od.available as disponible, 
+		$q = "select od.id, od.order_id, od.product_id, od.product_detail_id, s.id as idtalla, od.available as disponible, 
 		od.item_status as istatus, od.check_revision as revision, od.quantity, od.price, p.name as producto, 
 		p.description, s.name as talla, s.unit, sd.weight as peso, pd.location as ubicacion, pd.disused as desuso 
 		from orders o, order_details od, products p, sizes s, size_product_detail sd, product_details pd 
@@ -104,8 +104,26 @@
 		return $orden;
 	}
 	/* ----------------------------------------------------------------------------------- */
+	function actualizarDisponibilidadItemsProductoPedido( $dbh, $detalle_orden ){
+		//Oculta los registros de detalle de producto que se hayan confirmado en un pedido y que
+		//hayan sido revisados desde el administrador indicando menor disponibilidad a la solicitada
+		include( "data-products.php" );
+
+		foreach ( $detalle_orden as $det ) {
+			if( $det["revision"] == "modif" && $det["disponible"] <= $det["quantity"] ){
+				//Si ítem posee estado revisado modificada (revisión administrador)
+				//Si cantidad revisada (disponible) es menor o igual a la cantidad solicitada
+				$id_det_prod 	= $det["product_detail_id"];
+				$idtalla 		= $det["idtalla"];
+				actualizarDisponibilidadTallaProducto( $dbh, $det["product_detail_id"], $det["idtalla"], 0 );
+				actualizarFechaNoDisponibilidad( $dbh, $det["product_detail_id"] );
+				actualizarDisponibilidadProductoPorAjuste( $dbh, $det["product_id"] );
+			}
+		}
+	}
+	/* ----------------------------------------------------------------------------------- */
 	function actualizarDisponibilidadItems( $dbh, $ido ){
-		//Asigna el valor de las cantidades solicitadas a las cantidades disponibles del pedido
+		//Asigna el valor de las cantidades solicitadas a las cantidades disponibles en el pedido
 		$detalle = obtenerDetalleOrden( $dbh, $ido );
 		foreach ( $detalle as $r ) {
 			actualizarDetallePedidoRevision( $dbh, $r["id"], $r["quantity"], "disp" );		
@@ -245,14 +263,23 @@
 	//Registrar confirmación/entrega de pedido
 	if( isset( $_POST["conf_ped"] ) ){
 		include( "bd.php" );
-		$estado = $_POST["status"];	
-		$idp = $_POST["conf_ped"];
-		$idr = actualizarEstadoPedido( $dbh, $idp, $estado, "no-leido" );
+		$estado 		= $_POST["status"];	
+		$idp 			= $_POST["conf_ped"];
+		
+		$idr 			= actualizarEstadoPedido( $dbh, $idp, $estado, "no-leido" );
+		$detalle_orden 	= obtenerDetalleOrden( $dbh, $idp );
+		$post_rev 		= isset( $_POST["post_r"] ) ? true : false;
 		
 		if( $estado == "confirmado" ){
-			//Al confirmar un pedido desde el administrador se asignan disponibles todas las cantidades
-			actualizarDisponibilidadItems( $dbh, $idp );
-			$monto_cnf = calcularTotalOrdenConfirmada( obtenerDetalleOrden( $dbh, $idp ) );
+			
+			if( $post_rev )
+				//Al confirmar un pedido posterior a la revisión se ajusta la disponibilidad de productos "en catálogo"
+				actualizarDisponibilidadItemsProductoPedido( $dbh, $detalle_orden );
+			else
+				//Al confirmar un pedido durante la revisión se asignan disponibles todas las cantidades "en el pedido"
+				actualizarDisponibilidadItems( $dbh, $idp );
+			
+			$monto_cnf = calcularTotalOrdenConfirmada( $detalle_orden );
 			notificarActualizacionPedido( $dbh, "pedido_confirmado_a", $idp, $monto_cnf );
 			$m1 = "confirmado"; $m2 = "confirmar";
 		}
@@ -260,7 +287,7 @@
 			//Se actualiza el pedido con las observaciones del administrador y 
 			//se notifica por email al cliente
 			ingresarObservacionesAdministrador( $dbh, $idp, $_POST["nota"] );
-			$monto_cnf = calcularTotalOrdenConfirmada( obtenerDetalleOrden( $dbh, $idp ) );
+			$monto_cnf = calcularTotalOrdenConfirmada( $detalle_orden );
 			notificarActualizacionPedido( $dbh, "pedido_entregado", $idp, $monto_cnf );
 			$m1 = "entregado";  $m2 = "entregar";
 		}
