@@ -46,8 +46,9 @@ function obtenerCarritoCompra( accion ){
         url:"fn/fn-cart.php",
         data:{ get_cart: 1, param: accion },
         success: function( response ){
-            console.log(response);
+            
             cart = jQuery.parseJSON( response );
+            console.log(cart);
             /*if( accion == 'agregar' )
                 registrarInicioCarrito();*/
                     
@@ -124,7 +125,7 @@ function actualizarItemCarrito( iditem, cant ){
     });
 }
 /* ----------------------------------------------------------------------------------- */
-function cargarCarritoGuardadoSesion(){
+/*function cargarCarritoGuardadoSesion(){
     //Procesa todos los ítems contenido en el carrito guardado para agregarse a la sesión del carrito
     
     $.ajax({
@@ -136,7 +137,7 @@ function cargarCarritoGuardadoSesion(){
             obtenerCarritoCompra('');            
         }
     });
-}
+}*/
 /* ----------------------------------------------------------------------------------- */
 function agregarItemCarrito(){
  	//Agrega un ítem de compra al carrito

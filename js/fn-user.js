@@ -43,7 +43,7 @@ function chequearEstadoCarrito(){
         
     }*/
     console.log( "Obteniendo carrito guardado..." );
-    cargarCarritoGuardadoSesion();
+    //cargarCarritoGuardadoSesion();
 }
 /* ----------------------------------------------------------------------------------- */
 function iniciarSesion( form, mode ){

@@ -267,8 +267,12 @@
 	if( isset( $_POST["get_cart"] ) ){
 		session_start();
 		include ('fn-constants.php');
+		include("../database/bd.php");
+		include("../database/data-products.php");
+		include("../database/data-user.php");
 		$param = $_POST["param"];
 
+		actualizarPreciosCarrito( $dbh );
 		obtenerContenidoCarritoCompra( $param );
 	}
 	/* ----------------------------------------------------------------------------------- */

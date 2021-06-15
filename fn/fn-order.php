@@ -44,7 +44,8 @@
 
 		$tpeso = 0;
 		foreach ( $detalle as $i ) {
-			$tpeso += obtenerTotalPesoItemOrden( $i, $orden["estado"] );
+			if( $i["item_status"] != "retirado" )
+				$tpeso += obtenerTotalPesoItemOrden( $i, $orden["estado"] );
 		}
 		
 		return $tpeso;

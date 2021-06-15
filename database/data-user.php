@@ -328,6 +328,7 @@
 		
 		$_SESSION["cart"] 	= json_decode( $filecart, true );
 	}
+	
 	/* ----------------------------------------------------------------------------------- */
 	/* ----------------------------------------------------------------------------------- */
 	/* Solicitudes asíncronas al servidor para procesar información de usuarios */
@@ -383,7 +384,6 @@
 		unset( $_SESSION["login"] );
 		unset( $_SESSION["user"] );
 		unset( $_SESSION["cart"] );
-		session_destroy();
 		echo "<script> window.location = 'index.php'</script>";		
 	}	
 	/* ----------------------------------------------------------------------------------- */

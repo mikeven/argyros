@@ -31,7 +31,7 @@
             $("#carga_catalogo").html( loader_gif );
         },
         success: function( response ){
-            //console.log( response );
+            console.log( response );
             datos = jQuery.parseJSON( response );
             mostrarElementosCatalogo( datos, carga_inicial );
             $("#carga_catalogo").html( "" );  

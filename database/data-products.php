@@ -226,16 +226,46 @@
 		if( $detalle["tipo_precio"] == "g" ){
 			$detalle["precio_peso"] = obtenerPrecioPorGramo( $var_gr_u, $detalle["precio_peso"] );
 			$detalle["precio"] 		= $detalle["precio_peso"];										
-			// $detalle["precio"] : Precio por pieza
+			// $detalle["precio"] : Precio por gramo (peso)
 		}
 
 		if( $detalle["tipo_precio"] == "mo" ){
 			$detalle["precio_mo"] 	= obtenerPrecioPorManoObra( $var_gr_u, 1, $detalle["precio_mo"] );
 			$detalle["precio"] 		= $detalle["precio_mo"];										
-			// $detalle["precio"] : Precio por pieza
+			// $detalle["precio"] : Precio por Mano de Obra
 		}
 		
 		return $detalle;
+	}
+	/* ----------------------------------------------------------------------------------- */
+	function obtenerPrecioRegistroTallaProducto( $dbh, $iddet, $idt ){
+		// Devuelve el precio de un registro de talla de producto
+
+		$reg_detalle 			= obtenerRegistroDetalleProductoPorId( $dbh, $iddet );
+		$reg_detalle 			= preciosDetalle( $dbh, $reg_detalle );
+		$talla 					= obtenerRegistroTallaDetalleProducto( $dbh, $iddet, $idt );
+
+		if( $reg_detalle["tipo_precio"] == "g" || $reg_detalle["tipo_precio"] == "mo" )
+			$talla["precio"] 	= obtenerPrecioPorPeso( $talla["peso"], $reg_detalle["precio"] );
+			
+		if( $reg_detalle["tipo_precio"] == "p" ) $talla["precio"] = $reg_detalle["precio"];
+		
+		return $talla["precio"];
+	}
+	/* ----------------------------------------------------------------------------------- */
+	function actualizarPreciosCarrito( $dbh ){
+		//Actualiza el precio unutario de los ítems agregados al carrito 
+		$carrito_act 			= array();
+		$carrito 				= $_SESSION["cart"];
+
+		foreach ( $carrito as $item ) {
+			$precio_unit 		= obtenerPrecioRegistroTallaProducto( $dbh, $item["iddetalle"], $item["idseltalla"] );
+			$item["unit_price"] = $precio_unit;
+			$carrito_act[] 		= $item;
+		}
+
+		$_SESSION["cart"] = $carrito_act;
+		guardarEstadoCarrito( $_SESSION["cart"], "" );
 	}
 	/* ----------------------------------------------------------------------------------- */
 	function cargarImagenesDetalle( $dbh, $detalle ){
@@ -495,8 +525,8 @@
 		from makings t, making_product tp where tp.making_id = t.id and tp.product_id = $idp 
 		order by t.name ASC";
 		
-		$data = mysqli_query( $dbh, $q );
-		$lista = obtenerListaRegistros( $data );
+		$data 	= mysqli_query( $dbh, $q );
+		$lista 	= obtenerListaRegistros( $data );
 		return $lista;
 	}
 	/* ----------------------------------------------------------------------------------- */
@@ -510,17 +540,9 @@
 		dp.weight_price_value as precio_peso 
 		FROM product_details dp LEFT JOIN treatments t ON t.id = dp.treatment_id 
 		LEFT JOIN colors c ON dp.color_id = c.id WHERE dp.product_id = $idp order by dp.id ASC";
-
-		/*$q = "select dp.id as id, dp.color_id as id_color, c.name as color, c.uname as ucolor, 
-		dp.treatment_id as id_bano, t.name as bano, t.uname as ubano, 
-		dp.price_type as tipo_precio, dp.weight as peso, dp.piece_price_value as precio_pieza, 
-		manufacture_value as precio_mo, dp.weight_price_value as precio_peso 
-		FROM product_details dp, treatments t, colors c where dp.color_id = c.id and 
-		dp.treatment_id = t.id and dp.product_id = $idp order by dp.id ASC";*/
-
 		
-		$data = mysqli_query( $dbh, $q );
-		$lista = obtenerListaRegistros( $data );
+		$data 	= mysqli_query( $dbh, $q );
+		$lista 	= obtenerListaRegistros( $data );
 		return $lista;		
 	}
 	/* ----------------------------------------------------------------------------------- */
@@ -531,12 +553,6 @@
 		dp.product_id as pid, dp.weight_price_value as precio_peso 
 		FROM product_details dp LEFT JOIN treatments t ON t.id = dp.treatment_id 
 		LEFT JOIN colors c ON dp.color_id = c.id WHERE dp.id = $idd";
-
-		/*select dp.id as id, c.id as color, t.id as bano, dp.price_type as tipo_precio, 
-		dp.weight as peso, dp.piece_price_value as precio_pieza, dp.manufacture_value as precio_mo, 
-		dp.product_id as pid, dp.weight_price_value as precio_peso 
-		FROM product_details dp, treatments t, colors c 
-		where dp.color_id = c.id and dp.treatment_id = t.id and dp.id = $idd*/
 		
 		$data = mysqli_query( $dbh, $q );
 		return mysqli_fetch_array( $data );		
@@ -567,8 +583,7 @@
 		where spd.size_id = s.id and spd.product_detail_id = $idd order by vsize ASC, talla ASC";
 		
 		$data = mysqli_query( $dbh, $q );
-		$lista = obtenerListaRegistros( $data );
-		return $lista;
+		return obtenerListaRegistros( $data );
 	}
 	/* ----------------------------------------------------------------------------------- */
 	function obtenerTallasDetalleProducto( $dbh, $idd ){
@@ -580,8 +595,17 @@
 		order by vsize ASC, talla ASC";
 		
 		$data = mysqli_query( $dbh, $q );
-		$lista = obtenerListaRegistros( $data );
-		return $lista;
+		return obtenerListaRegistros( $data );
+	}
+	/* ----------------------------------------------------------------------------------- */
+	function obtenerRegistroTallaDetalleProducto( $dbh, $idd, $idt ){
+		//Devuelve los registros de tallas DISPONIBLES de detalle de producto
+		$q = "select spd.size_id as idtalla, s.name as talla, spd.visible as visible, 
+		spd.adjustable as ajustable, convert(s.name, decimal(4,2)) as vsize, s.unit as unidad, 
+		spd.weight as peso from size_product_detail spd, sizes s 
+		where spd.size_id = s.id and spd.product_detail_id = $idd and spd.size_id = $idt";
+		
+		return mysqli_fetch_array( mysqli_query( $dbh, $q ) );
 	}
 	/* ----------------------------------------------------------------------------------- */
 	function obtenerDatosDetalleProductoPorId( $dbh, $idd ){

@@ -196,9 +196,9 @@
 	function obtenerPrecioCatalogo( $producto ){
 		// Devuelve el precio de un producto de catálogo según el tipo de precio
 
-		if( $producto["tipo_precio"] == "g" ) 	$precio = $producto["precio_peso"]." $/g";
-		if( $producto["tipo_precio"] == "mo" ) 	$precio = $producto["precio_mo"]." $/g";
-		if( $producto["tipo_precio"] == "p" ) 	$precio = $producto["precio_pieza"]." $/p";
+		if( $producto["tipo_precio"] == "g" ) 	$precio = $producto["precio"]." $/g";
+		if( $producto["tipo_precio"] == "mo" ) 	$precio = $producto["precio"]." $/g";
+		if( $producto["tipo_precio"] == "p" ) 	$precio = $producto["precio"]." $/p";
 		
 		return $precio;
 	}
@@ -395,6 +395,9 @@
 	/* ----------------------------------------------------------------------------------- */
 	function obtenerProductosPorBusqueda( $dbh, $busqueda ){
 		//Devuelve una lista de productos que incluyan el texto de búsqueda en algunos de sus parámetros
+		
+		$busqueda 			= str_replace("+", "%20", $busqueda );
+		
 		$vproductos 		= array();
 		$busqueda_detalle 	= "";
 		$busqueda_por_ids   = false;
