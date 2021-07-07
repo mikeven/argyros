@@ -127,6 +127,14 @@
 		return $pagina_catalogo;
 	}
 	/* ----------------------------------------------------------------------------------- */
+	function ajustarParamTallas( $url_params ){
+		//
+		if( isset($url_params["talla"]) )
+			$url_params["talla"] = str_replace( " ", "+", $url_params["talla"] );
+
+		return $url_params;
+	}
+	/* ----------------------------------------------------------------------------------- */
 	ini_set( 'display_errors', 1 );
 
 	//$purl = "../../argyros/trunk/admin_/"; //Localhost
@@ -151,7 +159,10 @@
 		$p1 = $_POST["pos_i"]; $p2 = $_POST["pos_f"];
 		
 		if( isset( $urlparsed["query"] ) )
-			parse_str( $urlparsed["query"], $url_params );
+			parse_str( $urlparsed["query"], $parametros_url );
+
+		$url_params = ajustarParamTallas( $parametros_url );
+		//print_r( $url_params );
 
 		if( isset( $_SESSION["login"] ) ) {
 			$productos 					= obtenerProductosListaCatalogo( $dbh, $catalogue_url, $url_params );

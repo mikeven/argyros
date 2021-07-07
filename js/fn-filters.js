@@ -67,9 +67,41 @@ function generarURLFiltroPeso( pmin, pmax ){
     });
 }
 
+/* ----------------------------------------------------------------------------------- */
+
+function generarURLFiltroMultiple( form, atributo ){
+	//Invoca la generación de la url para filtrar productos por múltiples valores de un atributo
+	// Atributos: Talla, Baño, Color
+	var ucatalogo 	= $("#urlcatalogoactual").val();
+	var form 		= $( "#" + form ).serialize();
+
+	$.ajax({
+        type:"POST",
+        url:"fn/fn-data-filters.php",
+        data:{ urlmultparam: atributo, valores: form, url_c: ucatalogo },
+        success: function( response ){
+            console.log( response );
+           	window.location.href = response;
+        }
+    });
+}
+
+/* ----------------------------------------------------------------------------------- */
+
 function setFilterBreadCrumb(){
 	//Copia el contenido del breadcrum principal en la sección de selección de filtros
 	$("#flt-breadcrumb").html( $("#argy-breadcrumb").html() );
+}
+/* ----------------------------------------------------------------------------------- */
+function algunValorFiltro( form ){
+	// Devuelve verdadero si al menos un valor de filtro de selección múltiple está seleccionado
+	var seleccion 	= false;
+	var marcados 	= $( "#" + form + " input[type=checkbox]:checked").length;
+
+	if( marcados > 0 ) 
+		seleccion = true;
+
+	return seleccion;
 }
 
 /* ----------------------------------------------------------------------------------- */
@@ -86,28 +118,36 @@ $( document ).ready(function() {
 		var trg = $(this).attr( "data-flt-cnt" );
 		$( "#" + trg ).show( "slow" );
 	});
-
+	/*...................................................*/
 	$("#btn_flt_precio_pieza").on( "click", function(){
 		var pmin = $("#flt_pre_pro_min").val();
 		var pmax = $("#flt_pre_pro_max").val();
 		generarURLFiltroPrecio( "pieza", pmin, pmax );
 	});
-
+	/*...................................................*/
 	$("#btn_flt_precio_peso").on( "click", function(){
 		var pmin = $("#flt_pre_pes_min").val();
 		var pmax = $("#flt_pre_pes_max").val();
 		console.log("peso");
 		generarURLFiltroPrecio( "peso", pmin, pmax );
 	});
-	
+	/*...................................................*/
 	$("#btn_flt_peso").on( "click", function(){
 		var pmin = $("#flt_peso_min").val();
 		var pmax = $("#flt_peso_max").val();
 		
 		generarURLFiltroPeso( pmin, pmax );
 	});
-
-
+	/*...................................................*/
+	$('.flt_forms').submit(function(e){
+		var form 		= $(this).attr( "id" );
+		var atributo 	= $(this).attr( "data-atributo" );
+		if( algunValorFiltro( form ) )
+        	generarURLFiltroMultiple( form, atributo );
+        
+        e.preventDefault();
+    });
+	/*...................................................*/
 });
 
 /*

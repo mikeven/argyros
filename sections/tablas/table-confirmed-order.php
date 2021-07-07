@@ -28,13 +28,13 @@
 	        $lnk_p = "product.php?id=$r[product_id]&iddet=$r[product_detail_id]";
 	        $cod_dp = "#" . $r["product_id"] . " - " . $r["product_detail_id"];
 	        
-	        if( $r["item_status"] == "retirado" ){	
+	        if( $r["item_status"] == "retirado" || $r["cant_rev"] == 0 ){	
 	        	// Si el ítem retirado pasa a un vector de ítems retirados con su numeración
 	        	$item_r = $r; $item_r["numeracion"] = $item_nro;
 	        	$items_retirados[] = $item_r;
 	        }
 	        
-	        if( /*( $r["cant_rev"] != 0 ) &&*/ ( $r["item_status"] != "retirado" ) ){
+	        if( ( $r["cant_rev"] != 0 ) && ( $r["item_status"] != "retirado" ) ){
 	        	$total_n_items += $r["cant_rev"];
 
 	        $cantidad_ = $r["cant_rev"];

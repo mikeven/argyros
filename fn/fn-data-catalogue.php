@@ -49,26 +49,21 @@
 		return $tiene_imagen;
 	}
 	/* ----------------------------------------------------------------------------------- */
-	/*function obtenerProductosDestacados( $dbh, $cdestacadas ){
-		//Devuelve los productos mostrados en la página de inicio
+	function matchFiltrosTodosEnAtributo( $dbh, $valores_atributo, $valores_filtro ){
+		//Devuelve verdadero si un producto posee todos los valores incluidos en el filtro de un atributo
+		//Átributos: Línea, Trabajo
+		$match 			= false;
+		$num_matches 	= 0;
+		
+		foreach ( $valores_atributo as $atributo ) {
+			if( in_array( $atributo, $valores_filtro ) )
+				$num_matches++;
+		}
+		if( $num_matches >= count( $valores_filtro ) )
+			$match = true;
 
-		$pdestacados[0] = obtenerUltimoProductoCategoria( $dbh, $cdestacadas[0]["id"] ); //Zarcillos
-		$pdestacados[1] = obtenerUltimoProductoCategoria( $dbh, $cdestacadas[1]["id"] );	//Gargantillas
-		$pdestacados[2] = obtenerUltimoProductoCategoria( $dbh, $cdestacadas[2]["id"] );	//Anillos
-		$pdestacados[3] = obtenerUltimoProductoCategoria( $dbh, $cdestacadas[3]["id"] );	//Pulseras
-
-		return $pdestacados;
-	}*/
-	/* ----------------------------------------------------------------------------------- */
-	/*function obtenerCategoriasDestacadas( $dbh ){
-		//Devuelve las categorías destacadas
-		$cdestacadas[0] = obtenerCategoriasDestacadaPorOrden( $dbh, 1 );
-    	$cdestacadas[1] = obtenerCategoriasDestacadaPorOrden( $dbh, 2 );
-    	$cdestacadas[2] = obtenerCategoriasDestacadaPorOrden( $dbh, 3 );
-    	$cdestacadas[3] = obtenerCategoriasDestacadaPorOrden( $dbh, 4 );
-
-    	return $cdestacadas;
-	}*/
+		return $match;
+	}
 	/* ----------------------------------------------------------------------------------- */
 	function matchFiltroAtributo( $dbh, $valores_atributo, $valores_filtro ){
 		//Devuelve verdadero si un producto posee atributos coincidentes a los filtros
@@ -260,13 +255,14 @@
 		return $comparadores[$atributo];
 	}
 	/* ----------------------------------------------------------------------------------- */
-	function filtrarProductosPorAtributoProducto( $dbh, $productos, $atributo, $valores ){
+	function filtrarProductosPorAtributoProducto( $dbh, $productos, $atributo_prod, $valores_filtro ){
 		//Devuelve la lista de productos que coinciden en atributo de producto con los valores del filtro
+		//Atributos: Línea, Trabajo
 		$filtrados = array();	
 		foreach ( $productos as $p ){
 			
-			$vatributos = obtenerComparadoresConFiltroPorAtributo( $dbh, $p["idp"], $atributo );
-			if( matchFiltroAtributo( $dbh, $vatributos, $valores ) ){
+			$vatributos = obtenerComparadoresConFiltroPorAtributo( $dbh, $p["idp"], $atributo_prod );
+			if( matchFiltrosTodosEnAtributo( $dbh, $vatributos, $valores_filtro ) ){
 				$filtrados[] = $p;
 			}
 		}
@@ -276,6 +272,7 @@
 	/* ----------------------------------------------------------------------------------- */
 	function filtrarProductosPorAtributoDetalleProducto( $productos, $param, $vals_filtro ){
 		//Devuelve la lista de productos que coinciden en atributo detalle de producto con los valores del filtro
+		//Atributos: Categoría, Baño, Color
 		$filtrados = array();
 
 		foreach ( $productos as $p ){
@@ -288,7 +285,7 @@
 	}
 	/* ----------------------------------------------------------------------------------- */
 	function obtenerComparadoresTallaProducto( $tallas ){
-		// Devuelve los valores a comparar de las tallas con los valores de tallas en los filtros
+		// Devuelve los valores a comparar de las tallas de los productos con los valores de tallas en los filtros
 		$comparadores = array();
 		foreach ( $tallas as $t ) {
 			if( $t["visible"] == 1 )
@@ -393,18 +390,51 @@
 		return $prods_filtrados;
 	}
 	/* ----------------------------------------------------------------------------------- */
+	function obtenerArrayIds( $regs ){
+		$ids = array();
+		foreach ( $regs as $r ) $ids[] = $r["id"];
+
+		return $ids;
+	}
+	/* ----------------------------------------------------------------------------------- */
+	function busquedaMultiplePorPalabra( $dbh, $busqueda ){
+		// Devuelve los ids de producto que contengan la mayoría de las palabras contenidas en la búsqueda
+		
+		$ids_productos 	= array();
+		$ids_resultados = array();
+		$palabras 		= explode( '%', $busqueda );
+
+		foreach ( $palabras as $p ) {
+			$regs 				= obtenerIdsProductosParametroDirectoProducto( $dbh, $p );
+			$ids_productos[] 	= obtenerArrayIds( $regs );
+		}
+
+		$interseccion = $ids_productos[0];
+		foreach ( $ids_productos as $bloque ) {
+			$interseccion 		= array_intersect( $interseccion, $bloque );
+		}
+		foreach ( $interseccion as $id ) {
+			$r["id"] 			= $id;
+			$ids_resultados[] 	= $r;
+		}
+
+		return $ids_resultados;
+	}
+	/* ----------------------------------------------------------------------------------- */
 	function obtenerProductosPorBusqueda( $dbh, $busqueda ){
 		//Devuelve una lista de productos que incluyan el texto de búsqueda en algunos de sus parámetros
 		
-		$busqueda 			= str_replace("+", "%20", $busqueda );
+		$busqueda 			= str_replace( " ", "%", $busqueda );
 		
 		$vproductos 		= array();
 		$busqueda_detalle 	= "";
 		$busqueda_por_ids   = false;
 
 		//Búsqueda en los atributos: nombre, descripción, código, categoría, subcategoría, material
-		$ids_productos 		= obtenerIdsProductosParametroDirectoProducto( $dbh, $busqueda );
+		$ids_productos 		= busquedaMultiplePorPalabra( $dbh, $busqueda );
 		$vproductos 		= array_merge( $vproductos, fnProductosBusqueda( $dbh, $ids_productos, "prod", true ) );
+		//$ids_productos 	= obtenerIdsProductosParametroDirectoProducto( $dbh, $busqueda );
+		//$vproductos 		= array_merge( $vproductos, fnProductosBusqueda( $dbh, $ids_productos, "prod", true ) );
 		
 		//Búsqueda en los atributos: baño
 		$ids_productos 		= obtenerProductosParametroDetalleProducto( $dbh, $busqueda, "bano" );
@@ -419,6 +449,10 @@
 		$vproductos 		= array_merge( $vproductos, fnProductosBusqueda( $dbh, $ids_productos, "prod_det", true ) );
 		
 		//Búsqueda en los atributos: línea
+		$ids_productos 		= obtenerProductosParametroDetalleProducto( $dbh, $busqueda, "linea" );
+		$vproductos 		= array_merge( $vproductos, fnProductosBusqueda( $dbh, $ids_productos, "prod_det", true ) );
+
+		//Búsqueda en los atributos: país
 		$ids_productos 		= obtenerProductosParametroDetalleProducto( $dbh, $busqueda, "linea" );
 		$vproductos 		= array_merge( $vproductos, fnProductosBusqueda( $dbh, $ids_productos, "prod_det", true ) );
 		

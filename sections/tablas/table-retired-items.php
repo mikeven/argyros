@@ -1,5 +1,5 @@
 <div id="items_retirados">
-	<h4>Ítems Retirados</h4>
+	<h4>Ítems Retirados / No Disponibles</h4>
 	<table class="tabla-pedido">
 		<thead>
 		<tr>

@@ -530,6 +530,15 @@
 		return $lista;
 	}
 	/* ----------------------------------------------------------------------------------- */
+	function obtenerNombreAtributoPorUname( $dbh, $tabla, $uname ){
+		// Devuelve el nombre de atributo asociado a su uname
+		$q = "select name from $tabla where uname = '$uname'";
+		
+		$data = mysqli_query( $dbh, $q );
+		if( $data )
+			return mysqli_fetch_array( $data );	
+	}
+	/* ----------------------------------------------------------------------------------- */
 	function obtenerDetalleProductoPorId( $dbh, $idp ){
 		//Devuelve los registros detalles asociados a un producto dado su id
 		
@@ -716,9 +725,13 @@
 
 		$q = "select p.id from products p, categories ca, subcategories sc, countries co, materials m 
 		where (p.visible = 1 and p.category_id = ca.id and p.subcategory_id = sc.id and 
-		p.material_id = m.id and p.country_id = co.id ) and ( lower(p.name) like lower('%$busqueda%') 
-		or lower(p.description) like lower('%$busqueda%') or lower(p.code) like lower('%$busqueda%') 
-		or lower(m.name) like lower('%$busqueda%') or lower(ca.name) like lower('%$busqueda%') 
+		p.material_id = m.id and p.country_id = co.id ) 
+		and ( lower(p.name) like lower('%$busqueda%') 
+		or lower(p.description) like lower('%$busqueda%') 
+		or lower(p.code) like lower('%$busqueda%') 
+		or lower(m.name) like lower('%$busqueda%') 
+		or lower(co.name) like lower('%$busqueda%') 
+		or lower(ca.name) like lower('%$busqueda%') 
 		or lower(sc.name) like lower('%$busqueda%') ) order by id DESC";
 
 		$data = mysqli_query( $dbh, $q );

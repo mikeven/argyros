@@ -28,20 +28,21 @@
 				</div>
 				<?php } ?>
 				
+				<div>Piezas total: <span class="data_total_orden"><?php echo $orden["nitems"]?></span></div>
+				
+				<div>
+					Peso total: 
+					<span class="data_total_orden"><?php echo number_format( $orden["tpeso"], 2, ".", " " )?> gr </span>
+				</div>
+
 				<?php if( $orden["estado"] == "revisado" || 
-						  $orden["estado"] == "confirmado" ) { ?>
+						  $orden["estado"] == "confirmado" || 
+						  $orden["estado"] == "entregado" ) { ?>
 				<div>
 					Total: <span class="data_total_orden">$<?php echo $orden["total_ajuste"]; ?></span>
 					<input type="hidden" id="monto_orden_cnf" value="<?php echo $orden[total_ajuste]; ?>">
 				</div>
 				<?php } ?>
-
-				<div>Ítems: <span class="data_total_orden"><?php echo $orden["nitems"]?></span></div>
-				
-				<div>
-					Peso Total: 
-					<span class="data_total_orden"><?php echo number_format( $orden["tpeso"], 2, ".", " " )?> gr </span>
-				</div>
 				
 				<hr>
 				<?php if( $orden["nota_compra_cliente"] != "" ) { ?>

@@ -1,3 +1,8 @@
+<style type="text/css">
+	.chkflt{ padding-left: 0 !important; }
+	.flt_forms_btn{ font-size: 10px; float: right; margin-right: 30%; }
+	.flt_forms .title{ float: left; }
+</style>
 <div id="catalog-filters" class="fltout megamenu-container_ banner-bottom mega-col-6" style="">
 	<ul class="sub-mega-menu">
 		<div class="sb-wrapper">
@@ -38,7 +43,7 @@
 							Hasta
 							<input type="text" id="flt_pre_pro_max" class="form-control input_flt" placeholder="$" 
 							name="f_pprod_max" value="" style="width:50%" onkeypress="return isNumberKey(event)">
-							<button id="btn_flt_precio_pieza" class="btn btn-2" type="button">Aceptar</button>
+							<button id="btn_flt_precio_pieza" class="btn" type="button">Aceptar</button>
 						</div>
 					</div>
 
@@ -52,7 +57,7 @@
 							Hasta
 							<input type="text" id="flt_pre_pes_max" class="form-control input_flt" placeholder="$"
 							name="f_ppeso_max" value="" style="width:50%" onkeypress="return isNumberKey(event)">
-							<button id="btn_flt_precio_peso" class="btn btn-2" type="button">Aceptar</button>
+							<button id="btn_flt_precio_peso" class="btn" type="button">Aceptar</button>
 						</div>
 					</div>
 
@@ -66,7 +71,7 @@
 							Hasta
 							<input type="text" id="flt_peso_max" class="form-control input_flt" placeholder="gr"
 							name="f_peso_prod_max" value="" style="width:50%" onkeypress="return isNumberKey(event)">
-							<button id="btn_flt_peso" class="btn btn-2" type="button">Aceptar</button>
+							<button id="btn_flt_peso" class="btn" type="button">Aceptar</button>
 						</div>
 					</div>
 
@@ -75,10 +80,14 @@
 					
 					<div id="flt_talla" class="tab_filtro_contenido">
 						<div class="tag-group" id="coll-filter-3">
-							<p class="title"> Talla </p>
-							<ul>
-								<div id="opciones_filtro_talla"></div>
-							</ul>
+							<form id="frm_filtro_catalogo_talla" class="flt_forms" data-atributo="<?php echo P_FLT_TALLA ?>">
+								<p class="title"> Talla </p>
+								<input type="submit" value="FILTRAR" class="flt_forms_btn btn" data-frm="frm_filtro_catalogo_talla">
+								<ul>
+									<div id="opciones_filtro_talla"></div>
+								</ul>
+								
+							</form>
 						</div>
 					</div>
 
@@ -97,10 +106,13 @@
 
 					<div id="flt_bano" class="tab_filtro_contenido">
 						<div class="tag-group" id="coll-filter-3">
-							<p class="title"> Baños </p>
-							<ul>
-								<div id="opciones_filtro_bano"></div>
-							</ul>
+							<form id="frm_filtro_catalogo_bano" class="flt_forms" data-atributo="<?php echo P_FLT_BANO ?>">
+								<p class="title"> Baños </p>
+								<input type="submit" value="FILTRAR" class="flt_forms_btn btn" data-frm="frm_filtro_catalogo_bano">
+								<ul>
+									<div id="opciones_filtro_bano"></div>
+								</ul>
+							</form>
 						</div>
 					</div>
 
@@ -124,10 +136,13 @@
 
 					<div id="flt_color" class="tab_filtro_contenido">
 						<div class="tag-group" id="coll-filter-3">
-							<p class="title"> Colores </p>
-							<ul>
-								<div id="opciones_filtro_color"></div>
-							</ul>
+							<form id="frm_filtro_catalogo_color" class="flt_forms" data-atributo="<?php echo P_FLT_COLOR ?>">
+								<p class="title"> Colores </p>
+								<input type="submit" value="FILTRAR" class="flt_forms_btn btn" data-frm="frm_filtro_catalogo_color">
+								<ul>
+									<div id="opciones_filtro_color"></div>
+								</ul>
+							</form>
 						</div>
 					</div>
 

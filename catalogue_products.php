@@ -5,7 +5,7 @@
      */
     include( "database/init.php" );
     include( "database/bd.php" );
-	include( "database/data-user.php" );
+		include( "database/data-user.php" );
     include( "database/data-products.php" );
     include( "database/data-categories.php" );
     include( "fn/fn-product.php" );
@@ -134,6 +134,11 @@
 			border-bottom:1px solid #818285;
 			max-height: 500px;
 	    	overflow-y: scroll;
+		}
+
+		#catalog-filters .checked{
+			color: #a7b239 !important;
+			font-weight: bolder !important;
 		}
 		
 		.tab_filtro_contenido{ display: none; }

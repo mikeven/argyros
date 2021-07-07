@@ -7,7 +7,6 @@
 	
 	function obtenerVectorValoresFiltro( $url_params, $param ){
 		//Devuelve un vector con los valores contenidos en un parámetro de la URL
-		
 		$string_vector = $url_params[$param];	//tra = _tra1_tra2..._traN
 		$vector = explode( SEPFLT, $string_vector );
 		unset( $vector[0] ); 					// Se elimina el inicio de la url
@@ -23,7 +22,24 @@
 		return $vector;
 	}
 	/* ----------------------------------------------------------------------------------- */
-	function obtenerTextoEtiquetaFiltro( $param, $texto ){
+	function obtenerNombreAtributoFiltro( $dbh, $param, $texto ){
+		//Devuelve el nombre del atributo dado por el texto url del filtro
+
+		$tablas_uname 	= array( 				// Nombre de tablas en BD de los atributos
+			P_FLT_CATEGORIA => "categories",
+			P_FLT_LINEA 	=> "plines",
+			P_FLT_TRABAJO 	=> "makings",
+			P_FLT_COLOR 	=> "colors",
+			P_FLT_BANO 		=> "treatments"
+		);
+
+		$tabla 			= $tablas_uname[ $param ];
+		$data_nombre 	= obtenerNombreAtributoPorUname( $dbh, $tabla, $texto );
+
+		return $data_nombre["name"];
+	}
+	/* ----------------------------------------------------------------------------------- */
+	function obtenerTextoEtiquetaFiltro( $dbh, $param, $texto ){
 		//Devuelve el texto contenido en la etiqueta de panel de filtros seleccionados
 		if( $param == P_FLT_PIEZA || $param == P_FLT_PESO || $param == P_FLT_PESO_PROD ){
 			$vector = explode( SEPVALFLT, $texto );
@@ -33,18 +49,19 @@
 				$texto = $tprecio.": ".$vector[0]."gr - ".$vector[1]." gr";	
 			}
 		}
-		/*else{
-			$texto = ucfirst( str_replace( "-", " ", $texto ) );
-			if( $texto == "N/A" )  $texto = "Ajustable/Única";	// Tallas únicas - ajustables
-		}*/
+		else{
+			if( $param == P_FLT_BANO || $param == P_FLT_TRABAJO || $param == P_FLT_LINEA || $param == P_FLT_COLOR ){
+				$texto = obtenerNombreAtributoFiltro( $dbh, $param, $texto );
+			}
+		}
 
 		return $texto;
 	}
 	/* ----------------------------------------------------------------------------------- */
-	function obtenerValoresFiltros( $catalogue_url, $url_params ){
+	function obtenerValoresFiltros( $dbh, $catalogue_url, $url_params ){
 		//Devuelve los valores contenidos en los parámetros de filtros separados por comas
-		$string = "";
-		$data_filtro = array();
+		$string 		= "";
+		$data_filtro 	= array();
 		
 		foreach ( $url_params as $param=>$valor ){
 			
@@ -55,10 +72,9 @@
 				$valores = explode( SEPFLT, $valor );
 				foreach ( $valores as $texto ) {
 					if( $texto != "" ){
-						$item_filtro["url_filtro"] = urlFiltro( $catalogue_url, $url_params, 
-																$param, trim( $texto ) );
-						$item_filtro["texto"] = obtenerTextoEtiquetaFiltro( $param, $texto );
-						$data_filtro[] = $item_filtro;
+						$item_filtro["url_filtro"] 	= urlFiltro( $catalogue_url, $url_params, $param, trim( $texto ) );
+						$item_filtro["texto"] 		= obtenerTextoEtiquetaFiltro( $dbh, $param, $texto );
+						$data_filtro[] 				= $item_filtro;
 					}
 				}
 			}
@@ -81,7 +97,7 @@
 		// Devuelve un vector con los ids de las tallas de categoría
 		$idtallas = array();
 		foreach ( $tallas as $t ) {
-			$idtallas[] = $t["id"];
+			$idtallas[] = $t["idtalla"];
 		}
 		return $idtallas;
 	}
@@ -89,7 +105,7 @@
 	function obtenerTallasProductos( $dbh, $productos, $tallas_ctg ){
 		//Devuelve las tallas incluídas en los productos asociadas a la categoría
 		$filtros_tallas_productos 				= array();
-		$idtallas_ctg 							= obtenerIdsTallasCategoria( $tallas_ctg );
+		//$idtallas_ctg 							= obtenerIdsTallasCategoria( $tallas_ctg );
 		
 		foreach ( $tallas_ctg as $tc ) {
 
@@ -102,9 +118,6 @@
 					if( $tc["idtalla"] == $tprod["idtalla"] ){
 						
 						if( yaAgregadoVectores( $tc, $filtros_tallas_productos, "idtalla" ) == false ){
-							$talla["idtalla"] 			= $tc["idtalla"];
-							$talla["talla"] 			= $tc["talla"];
-							$talla["utalla"] 			= $producto["talla"];
 							$filtros_tallas_productos[] = $tc;
 						}
 
@@ -261,6 +274,20 @@
 		return $url_nueva;
 	}
 	/* ----------------------------------------------------------------------------------- */
+
+	function valoresMultipleParametroUrl( $valores_frm ){
+		//Devuelve los valores múltiples indicados en los filtros en formato de la url
+		$vparam 	= "";
+		$valores 	= array_keys( $valores_frm );
+
+		foreach ( $valores as $v ) {
+			$vparam .= SEPFLT.$v;
+		}
+
+		return $vparam;
+	}
+
+	/* ----------------------------------------------------------------------------------- */
 	
 	function urlFiltro( $url_base, $url_params, $param, $val ){
 		//Devuelve el url parametrizado con los valores para el filtro, excepto precios
@@ -299,8 +326,8 @@
 	/* ----------------------------------------------------------------------------------- */
 	function urlFiltroPrecio( $url_base, $url_params, $param, $pmin, $pmax ){
 		//Devuelve el url parametrizado con los valores de filtro para precios
-		$url_nueva = $url_base;
-		$valor_param = "&".$param."=".$pmin.SEPVALFLT.$pmax;
+		$url_nueva 		= $url_base;
+		$valor_param 	= "&".$param."=".$pmin.SEPVALFLT.$pmax;
 
 		
 		if ( paramEnUrl( $param, $url_params ) ){
@@ -315,18 +342,35 @@
 		return $url_filtro;
 	}
 	/* ----------------------------------------------------------------------------------- */
+	function urlFiltroMultiplesValores( $url_base, $url_params, $param, $valores ){
+		//Devuelve el url parametrizado con los valores múltiples de atributo para filtro de productos
+		$url_nueva 		= $url_base;
+		$valores_url	= valoresMultipleParametroUrl( $valores );
+		$valor_param 	= "&".$param."=".$valores_url;
+
+		if ( paramEnUrl( $param, $url_params ) ){
+			//Si el parámetro está incluído en la URL se actualiza con el valor nuevo
+			$url_filtro = actualizarValorParametroURL( $url_nueva,  $url_params[$param], $valores_url );
+		}else{
+			//Si el parámetro no está incluído en la URL se agrega el parámetro nuevo con su valor
+			$url_filtro = $url_nueva.$valor_param;
+		}
+
+		return $url_filtro;
+	}
+	/* ----------------------------------------------------------------------------------- */
 	function obtenerTextoPanelFiltros( $dbh, $productos, $d_tallas, $catalogue_url, $url_params ){
 		
 		//data-products.php:
-		$data_filtros["tallas"] 	= $d_tallas;//obtenerTallasProductos( $dbh, $productos, $d_tallas );
+		$data_filtros["tallas"] 	= obtenerTallasProductos( $dbh, $productos, $d_tallas ); //$d_tallas;//
 		$data_filtros["categorias"] = obtenerCategoriasProductos( $dbh, $productos );
 		$data_filtros["trabajos"] 	= obtenerTrabajosProductos( $dbh, $productos );
 		$data_filtros["lineas"] 	= obtenerLineasProductos( $dbh, $productos );
 		$data_filtros["banos"] 		= obtenerBanosProductos( $dbh, $productos );
 		$data_filtros["colores"] 	= obtenerColoresProductos( $dbh, $productos );
 
-		//$catalogue_url, $url_params: fn-catalogue.php
-		$data_filtros["url"]		= obtenerValoresFiltros( $catalogue_url, $url_params );
+		//$catalogue_url, $url_params: fn-paginator.php
+		$data_filtros["url"]		= obtenerValoresFiltros( $dbh, $catalogue_url, $url_params );
 
 		return $data_filtros;
 	}
@@ -424,67 +468,89 @@
 	}
 
 	/* ----------------------------------------------------------------------------------- */
+	function valorYaMarcado( $url_params, $atributo, $valor ){
+		// Devuelve 'checked' si un valor de filtro fue marcado previamente
+		$checked 	= "";
+		if( isset( $url_params[$atributo] ) ){
+			$filtro 	= obtenerVectorValoresFiltro( $url_params, $atributo );
+			if( in_array( $valor, $filtro ) )
+				$checked 	= "checked";
+		}
+		return $checked;
+	}
+	/* ----------------------------------------------------------------------------------- */
 	function obtenerOpcionesFiltros( $d_filtros, $productos, $catalogue_url, $url_params ){
 		// Devuelve las opciones de filtro por cada atributo de los productos filtrados
 		$opciones = array(); 
 		
 		$o_categorias = "";
 		foreach ( $d_filtros["categorias"] as $c ){
-			$url_f 		= urlFiltro( $catalogue_url, $url_params, P_FLT_CATEGORIA, trim( $c["ucat"] ) );
-            $o_categorias .= "<li><a title='$c[categoria]' href='$url_f'>
-								<span class='fe-checkbox'></span> $c[categoria]</a>
-							  </li>";
+			$url_f 			= urlFiltro( $catalogue_url, $url_params, P_FLT_CATEGORIA, trim( $c["ucat"] ) );
+			$checked 		= valorYaMarcado( $url_params, P_FLT_CATEGORIA, trim( $c["ucat"] ) );
+
+            $o_categorias 	.= "<li><a title='$c[categoria]' href='$url_f' class='$checked'>
+									<span class='fe-checkbox'></span> $c[categoria]</a>
+							  	</li>";
 		}
 
 		$o_filtros = "";
 		foreach ( $d_filtros["url"] as $flt_vo ) {
-			$o_filtros 	.= "<a href='$flt_vo[url_filtro]' class='tfilt'>
-								$flt_vo[texto] <i class='fa fa-times'></i>
-						   </a>";
+			$o_filtros 		.= "<a href='$flt_vo[url_filtro]' class='tfilt'>
+									$flt_vo[texto] <i class='fa fa-times'></i>
+						   		</a>";
 		}
 
 		$o_tallas = "";
 		foreach ( $d_filtros["tallas"] as $t ){
-			$url_f 		= urlFiltro( $catalogue_url, $url_params, P_FLT_TALLA, trim( $t["talla"] ) );
-			$n_talla 	= $t["talla"];  
-			
+			//$url_f 			= urlFiltro( $catalogue_url, $url_params, P_FLT_TALLA, trim( $t["talla"] ) );
+			$n_talla 		= $t["talla"];  
+			$checked 		= valorYaMarcado( $url_params, P_FLT_TALLA, trim( $t["talla"] ) );
+
 			if ( $t["talla"] == "ajust" )  $n_talla  = "Ajustable";
             if ( $t["talla"] == "unica" )  $n_talla  = "Única";
-            $o_tallas 	.= "<li><a title='Talla $n_talla' href='$url_f'>
-							<span class='fe-checkbox'></span> $n_talla</a>
-						  </li>";
+            $o_tallas 		.= "<li><a title='Talla $n_talla' href='#!' class='chkflt'>
+									<input type='checkbox' name='".trim( $t["talla"] )."' $checked> $n_talla</a>
+						  		</li>";
 		}
 
 		$o_banos = "";
 		foreach ( $d_filtros["banos"] as $b ){
-			$url_f = urlFiltro( $catalogue_url, $url_params, P_FLT_BANO, trim( $b["ubano"] ) );
-            $o_banos 	.= "<li><a title='$b[bano]' href='$url_f'>
-							<span class='fe-checkbox'></span> $b[bano]</a>
-						 </li>";
+			//$url_f 			= urlFiltro( $catalogue_url, $url_params, P_FLT_BANO, trim( $b["ubano"] ) );
+			$checked 		= valorYaMarcado( $url_params, P_FLT_BANO, trim( $b["ubano"] ) );
+
+            $o_banos 		.= "<li><a title='$b[bano]' href='#!'>
+									<input type='checkbox' name='".trim( $b["ubano"] )."' $checked> $b[bano]</a>
+						 		</li>";
 		}
 
 		$o_trabajos = "";
 		foreach ( $d_filtros["trabajos"] as $t ){
-			$url_f = urlFiltro( $catalogue_url, $url_params, P_FLT_TRABAJO, trim( $t["utrabajo"] ) );
-            $o_trabajos .= "<li><a title='$t[nombre]' href='$url_f'>
-								<span class='fe-checkbox'></span> $t[nombre]</a>
-							</li>";
+			$url_f 			= urlFiltro( $catalogue_url, $url_params, P_FLT_TRABAJO, trim( $t["utrabajo"] ) );
+			$checked 		= valorYaMarcado( $url_params, P_FLT_TRABAJO, trim( $t["utrabajo"] ) );
+
+            $o_trabajos 	.= "<li><a title='$t[nombre]' href='$url_f' class='$checked'>
+									<span class='fa fa-arrow-right'></span> $t[nombre]</a>
+								</li>";
 		}
 
 		$o_lineas = "";
 		foreach ( $d_filtros["lineas"] as $l ){
-			$url_f 		= urlFiltro( $catalogue_url, $url_params, P_FLT_LINEA, trim( $l["ulinea"] ) );
-            $o_lineas 	.= "<li><a title='$l[nombre]' href='$url_f'>
-								<span class='fe-checkbox'></span> $l[nombre]</a>
-						    </li>";
+			$url_f 			= urlFiltro( $catalogue_url, $url_params, P_FLT_LINEA, trim( $l["ulinea"] ) );
+			$checked 		= valorYaMarcado( $url_params, P_FLT_LINEA, trim( $l["ulinea"] ) );
+
+            $o_lineas 		.= "<li><a title='$l[nombre]' href='$url_f' class='$checked'>
+									<span class='fa fa-arrow-right'></span> $l[nombre]</a>
+						    	</li>";
 		}
 
 		$o_colores = "";
 		foreach ( $d_filtros["colores"] as $c ){
-			$url_f 		= urlFiltro( $catalogue_url, $url_params, P_FLT_COLOR, trim( $c["ucolor"] ) );
-            $o_colores 	.= "<li><a title='$c[color]' href='$url_f'>
-								<span class='fe-checkbox'></span> $c[color]</a>
-						    </li>";
+			//$url_f 			= urlFiltro( $catalogue_url, $url_params, P_FLT_COLOR, trim( $c["ucolor"] ) );
+			$checked 		= valorYaMarcado( $url_params, P_FLT_COLOR, trim( $c["ucolor"] ) );
+
+            $o_colores 		.= "<li><a title='$c[color]' href='#!'>
+									<input type='checkbox' name='".trim( $c["ucolor"] )."' $checked> $c[color]</a>
+						    	</li>";
 		}
 		
 		$opciones["enlaces_filtros"] 	= $o_filtros;
@@ -540,19 +606,23 @@
 			echo $url;
 		}
 	}
-	/*else{
-		if( isset( $_SESSION["login"] ) ) {
-			//	Flujo natural, sin la llamada asíncrona
-			//	$productos : fn-data-catalogue.php
-			$tallas_ctg 			= NULL;
-			if( isset( $_GET["c"] ) ){
-				$idc 				= obtenerIdCategoriaPorUname( $dbh, $_GET["c"] );
-				$tallas_ctg 		= obtenerTallasPorCategoria( $dbh, $idc["id"] );
-			}
+	
+	/* ----------------------------------------------------------------------------------- */
 
-			$productos = obtenerProductosFiltrados( $dbh, $productos, $catalogue_url, $url_params );
-			//$d_filtros = obtenerTextoPanelFiltros( $dbh, $productos, $tallas_ctg, $catalogue_url, $url_params );
-		}	
-	}*/
+	if( isset( $_POST["urlmultparam"] ) ){
+		//Llamada asíncrona para generar URL para filtrar productos por valores múltiples de un atributo
+		// Atributos: Talla, Baño, Color
+		include( "fn-catalogue.php" );
+		$atributo 		= $_POST["urlmultparam"];
+		$catalogue_url 	= $_POST["url_c"];
+		$urlparsed 		= parse_url( $catalogue_url );
+		
+		parse_str( $urlparsed["query"], $url_params );
+		parse_str( $_POST["valores"], 	$valores );
+
+		$url 		= urlFiltroMultiplesValores( $catalogue_url, $url_params, $atributo, $valores );
+		echo $url;
+	}
+
 	/* ----------------------------------------------------------------------------------- */
 ?>

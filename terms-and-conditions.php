@@ -260,7 +260,7 @@
 					 										Si requiere de alguna asesoría en esta área, nuestros ejecutivos le asistirán basados en nuestra experiencia para indicarle el medio de transporte más utilizado para su país.
 					 									</p>
 					 									<p>
-					 										Es de responsabilidad exclusiva de la empresa de transporte, cualquier retraso o imprevisto que pueda presentar la encomineda. 
+					 										Es de responsabilidad exclusiva de la empresa de transporte, cualquier retraso o imprevisto que pueda presentar la encomienda. 
 					 									</p>
 													</div>
 												</div>
@@ -293,7 +293,7 @@
 												<div id="inst-desp-fact" class="panel-collapse collapse" role="tabpanel" aria-labelledby="inst-de-desp-y-fact">
 													<div class="panel-body">
 														<p>
-															Argyros Inc. cuenta con procediminetos estandarizados en cada etapa de su compra. Es por ello, que si el cliente requiere de algún trabajo adicional, debe notificarlo.
+															Argyros Inc. cuenta con procedimientos estandarizados en cada etapa de su compra. Es por ello, que si el cliente requiere de algún trabajo adicional, debe notificarlo.
 														</p>
 
 														<p>

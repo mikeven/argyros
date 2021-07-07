@@ -238,7 +238,7 @@
 										<?php if( $orden["estado"] == "confirmado" || 
 										          $orden["estado"] == "entregado" ) { ?>
 											<div id="pedido_confirmado" class="bloque_pedido">
-												<?php include( "sections/tablas/tabla-pedido-confirmado.php" ); ?>
+												<?php include( "sections/tablas/table-confirmed-order.php" ); ?>
 											</div>
 										<?php } ?>
 
