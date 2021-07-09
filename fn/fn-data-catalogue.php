@@ -451,10 +451,6 @@
 		//Búsqueda en los atributos: línea
 		$ids_productos 		= obtenerProductosParametroDetalleProducto( $dbh, $busqueda, "linea" );
 		$vproductos 		= array_merge( $vproductos, fnProductosBusqueda( $dbh, $ids_productos, "prod_det", true ) );
-
-		//Búsqueda en los atributos: país
-		$ids_productos 		= obtenerProductosParametroDetalleProducto( $dbh, $busqueda, "linea" );
-		$vproductos 		= array_merge( $vproductos, fnProductosBusqueda( $dbh, $ids_productos, "prod_det", true ) );
 		
 		//Búsqueda en la unión: idproducto - id_detalle_producto
 		$prods_por_ids 		= obtenerProductosParametroDetalleProducto( $dbh, $busqueda, "codigo" );
@@ -531,10 +527,10 @@
 			$h_ncat 				= "Búsqueda: ".$busqueda;
 		}
 		/*..........................................................................*/
-		
-		$productos = obtenerProductosFiltrados( $dbh, $productos, $catalogue_url, $url_params, $ver_ocultos );
+		$l_productos["busqueda"] 		= $productos;
+		$l_productos["filtrados"] 		= obtenerProductosFiltrados( $dbh, $productos, $catalogue_url, $url_params, $ver_ocultos );
 
-		return $productos;
+		return $l_productos;
 	} 
 
 	/* ----------------------------------------------------------------------------------- */

@@ -155,18 +155,17 @@
 		
 		$catalogue_url 		= $_POST["listar_catalogo_url"];
 		$urlparsed 			= parse_url( $catalogue_url );
-		//$carga_inicial		= $_POST["carga_i"];
+		//$carga_inicial	= $_POST["carga_i"];
 		$p1 = $_POST["pos_i"]; $p2 = $_POST["pos_f"];
 		
 		if( isset( $urlparsed["query"] ) )
 			parse_str( $urlparsed["query"], $parametros_url );
 
-		$url_params = ajustarParamTallas( $parametros_url );
-		//print_r( $url_params );
+		$url_params 		= ajustarParamTallas( $parametros_url );
 
 		if( isset( $_SESSION["login"] ) ) {
 			$productos 					= obtenerProductosListaCatalogo( $dbh, $catalogue_url, $url_params );
-			$catalogo["resultados"] 	= obtenerBloqueProductosCatalogo( $purl, $productos, $p1, $p2 );
+			$catalogo["resultados"] 	= obtenerBloqueProductosCatalogo( $purl, $productos["filtrados"], $p1, $p2 );
 			$catalogo["filtros"] 		= obtenerBloqueFiltrosCatalogo( $dbh, $productos, $catalogue_url, $url_params );
 			
 			echo json_encode( $catalogo );
