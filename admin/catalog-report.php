@@ -1,6 +1,6 @@
 <?php
     /*
-     * Argyros Admin - Imágenes de catálogo
+     * Argyros Admin - Impresión de imágenes de catálogo
      * 
      */
     session_start();
