@@ -99,18 +99,18 @@
         
         <td align="center" class="dcol">
           <i data-c="!0" data-t="cd<?php echo $r['id'] ?>" data-sr="disp" 
-          class="fa fa-check i-rev cd<?php echo $r['id'] ?> 
-          <?php echo activarIconoRevision( $r['revision'], "disp" ); ?>" title="Disponible"></i>
+          class="fa fa-check i-rev cd<?php echo $r['id'] ?> <?php echo activarIconoRevision( $r['revision'], "disp" ); ?>" 
+          title="Disponible"></i>
         </td>
         <td align="center" class="dcol">
           <i data-c="0" data-t="cd<?php echo $r['id'] ?>" data-sr="nodisp" 
-          class="fa fa-times <?php echo activarIconoRevision( $r['revision'], "nodisp" ); ?> 
-          i-rev cd<?php echo $r['id'] ?>" title="No disponible"></i>
+          class="fa fa-times <?php echo activarIconoRevision( $r['revision'], "nodisp" ); ?> i-rev cd<?php echo $r['id'] ?>" 
+          title="No disponible"></i>
         </td>
         <td align="center" class="dcol">
           <i id="icd<?php echo $r['id'] ?>" data-c="*" data-t="cd<?php echo $r['id'] ?>" data-sr="modif"
-          class="fa fa-exclamation <?php echo activarIconoRevision( $r['revision'], "modif" ); ?> 
-          i-rev cd<?php echo $r['id'] ?>" title="Cambiar cantidad"></i>
+          class="fa fa-exclamation <?php echo activarIconoRevision( $r['revision'], "modif" ); ?> i-rev cd<?php echo $r['id'] ?>" 
+          title="Cambiar cantidad"></i>
         </td>
 
       </tr>

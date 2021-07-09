@@ -38,7 +38,7 @@
     <div><?php echo $orden["nota_compra_cliente"]?> </div>
 <?php } ?>
 
-<?php if( $orden["estado"] == "revisado" ) { ?>
+<?php if( $orden["estado"] == "revisado" || $orden["estado"] == "confirmado" || $orden["estado"] == "entregado" ) { ?>
     <div><b>Observaciones de revisión: </b></div>
     <div><?php echo $orden["revision_note"]?> </div>
 <?php } ?>

@@ -354,7 +354,8 @@
 	/* Solicitudes asíncronas al servidor sobre Órdenes de compra y lista pre-orden */
 	/* ----------------------------------------------------------------------------------- */
 	ini_set( 'display_errors', 1 );
-
+	/* ----------------------------------------------------------------------------------- */
+	
 	if( isset( $_POST["agregar_prod_preorden"] ) ){
 		//Invoca a función de agregar un producto a la lista de pre-orden
 		session_start();

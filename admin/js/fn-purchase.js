@@ -294,7 +294,7 @@ function calcularPreTotalOrdenes(){
 }
 /* --------------------------------------------------------- */
 function editarCantidadesItemOC( cantidades ){
-    //Invoca la edición de la cantidad de un ítem de orden de compra
+    // Invoca la edición de la cantidad de un ítem de orden de compra
     var items_oc    = JSON.stringify( cantidades );
     var id_oc       = $("#idordenc").val();
 
@@ -320,7 +320,7 @@ function editarCantidadesItemOC( cantidades ){
 }
 /* --------------------------------------------------------- */
 function editarCantidadesOC(){
-    //Invoca la edición de todas las cantidades de una orden de compra
+    // Invoca la edición de todas las cantidades de una orden de compra
     var cantidades          = new Array();
     var cantidades_cero     = false;
 
@@ -339,6 +339,68 @@ function editarCantidadesOC(){
     else
         tNotificar( "Orden de compra", "No deben haber cantidades en cero", "warning", 2200 );
 }
+/* --------------------------------------------------------- */
+function mostrarDatosOC( data ){
+    // Muestra los datos de una orden de compra asociada a un producto por talla (Ventana emergente)
+    $(".data_pop_oc").html("");
+    $("#pop_idoc").html( data.id );
+    $("#pop_ocusuario").html( data.usuario );
+    $("#pop_ocfecha").html( data.fecha );
+    $("#pop_occantidades").html( data.cantidades );
+    $("#pop_ocnota").html( data.nota );
+    $("#pop_enloc").attr( "href", data.url );
+}
+/* --------------------------------------------------------- */
+function obtenerDatosOC( idoc, iddt, idta ){
+    // Invoca los datos de una orden de compra para lista de productos por talla para preorden 
+    var img_wait = "<img src='images/ajax-loader.gif' width='16' height='16'>";
+    
+    $.ajax({
+        type:"POST",
+        url:"database/data-purchase.php",
+        data:{ popdataOC: idoc, iddetalle: iddt, idtalla: idta },
+        beforeSend: function () {
+            $("#img_wait").html( img_wait );
+            $("#tabla_hist_oc_prod").html("");
+        },
+        success: function( response ){
+            $("#img_wait").html( "" );
+            console.log(response);
+            $("#tabla_hist_oc_prod").html( response );
+            tablaHistorial();
+        }
+    });
+}
+
+/* --------------------------------------------------------- */
+function tablaHistorial(){
+
+    $('#datatable-purchist').dataTable({
+      "paging": true,
+      "iDisplayLength": 10,
+      "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "order": [ 0, "desc" ],
+      "language": {
+        "lengthMenu": "Mostrar _MENU_ regs por página",
+        "zeroRecords": "No se encontraron resultados",
+        "info": "Mostrando pág _PAGE_ de _PAGES_",
+        "infoEmpty": "No hay registros",
+        "infoFiltered": "(filtrados de _MAX_ regs)",
+        "search": "Buscar:",
+        "paginate": {
+            "first":      "Primero",
+            "last":       "Último",
+            "next":       "Próximo",
+            "previous":   "Anterior"
+        }
+      }
+    });
+}
+/* --------------------------------------------------------- */
 
 $( document ).ready(function() {	
     // ============================================================================ //
@@ -460,6 +522,16 @@ $( document ).ready(function() {
     $("#btn_guardar_cants").on( "click", function(){
         
         editarCantidadesOC();
+    });
+
+    //Clic: Clic en enlace de OC en tabla de productos por talla para preorden 
+    $("#dt-product-sizes-preorder").on( "click", ".pop-purch-data", function(){
+
+        var idoc = $(this).attr( "data-idoc" );
+        var iddt = $(this).attr( "data-iddt" );
+        var idta = $(this).attr( "data-idta" );
+
+        obtenerDatosOC( idoc, iddt, idta );
     });
 
 });

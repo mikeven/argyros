@@ -6,6 +6,7 @@
       <th>Orden</th>
       <th>Proveedor</th>
       <th class="datesort">Fecha</th>
+      <th>Comentario</th>
       <th>Total</th>
       <th>Status</th>
     </tr>

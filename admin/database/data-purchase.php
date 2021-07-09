@@ -29,7 +29,7 @@
 	/* ----------------------------------------------------------------------------------- */
 	function obtenerOrdenCompraPorId( $dbh, $ido ){
 		//Devuelve el registro de una orden de compra por id
-		$q = "select o.id, o.status as estado, o.note as nota, 
+		$q = "select o.id, o.status as estado, o.comment as comentario, 
 		date_format( o.created_at,'%d/%m/%Y') as fecha, date_format( o.created_at,'%m/%d/%Y') as fecha_en, 
 		date_format( o.created_at,'%m%d%Y') as fecha_mdy, o.created_at as creada, 
 		p.id as idpvd, p.name as nombre, p.number as numero, SUM(doc.quantity) AS cantidades, 
@@ -52,6 +52,51 @@
 		ORDER BY doc.product_id, doc.product_detail_id, vsize";
 
 		return obtenerListaRegistros( mysqli_query( $dbh, $q ) );
+	}
+	/* ----------------------------------------------------------------------------------- */
+	function obtenerOCTallaproducto( $dbh, $ido, $iddp, $idta ){
+		// Devuelve los registros de detalle de orden de compra indicado por id
+		$q = "select o.id, o.status as estado, o.comment as comentario, 
+		date_format( o.created_at,'%d/%m/%Y') as fecha, doc.quantity as cantidad, 
+		(spd.weight * doc.quantity) as tpeso, concat(u.first_name,' ',u.last_name) as usuario 
+		from purchases o, purchase_details doc, product_details pd, size_product_detail spd, sizes s, users u 
+		where doc.purchase_id = o.id and doc.product_detail_id = pd.id and 
+		spd.product_detail_id = pd.id and spd.size_id=s.id and s.id = $idta 
+		and pd.id = $iddp and o.user_id = u.id order by fecha DESC";
+
+		return obtenerListaRegistros( mysqli_query( $dbh, $q ) );
+	}
+	/* ----------------------------------------------------------------------------------- */
+	function obtenerCuerpoTablaHistorialOCProducto( $ordenes ){
+		// 
+		$cuerpo = "";
+
+		foreach ( $ordenes as $o ) {
+			$cant 					= $o["cantidad"]." und";
+			$peso 					= $o["tpeso"]." gr";
+			$o["cantidades"] 		= $cant." ( $peso )";
+			$url 					= "purchase-data.php?purchase-id=".$o["id"];
+			
+			$cuerpo 				.= "<tr>";
+			$cuerpo 				.= "<td><a href='$url' target='_blank'> OC #".$o["id"]."</a></td>";
+			$cuerpo 				.= "<td>".$o["fecha"]."</td>";
+			$cuerpo 				.= "<td>".$o["usuario"]."</td>";
+			$cuerpo 				.= "<td>$cant</td>";
+			$cuerpo 				.= "<td>$peso</td>";
+			$cuerpo 				.= "<td>".$o["comentario"]."</td>";
+			$cuerpo 				.= "</tr>";
+		}
+
+		return $cuerpo;
+	}
+	/* ----------------------------------------------------------------------------------- */
+	function obtenerHistorialOC( $ordenes ){
+		// Devuelve la tabla con el historial de órdenes de compra
+		$tabla 			= file_get_contents( "../sections/tables/table-history-purchase-product.html" );
+		$contenido 		= obtenerCuerpoTablaHistorialOCProducto( $ordenes );
+		$tabla 			= str_replace( "{filas}", $contenido, $tabla );
+
+		return $tabla;
 	}
 	/* ----------------------------------------------------------------------------------- */
 	function obtenerListaNotasOrden( $dbh, $ido ){
@@ -109,9 +154,9 @@
 		return mysqli_query( $dbh, $q );
 	}
 	/* ----------------------------------------------------------------------------------- */
-	function actualizarNotaOrdenCompra( $dbh, $iddo, $valor ){
-		//Actualiza la nota de una orden de compra
-		$q = "update purchases set note = '$valor' where id = $iddo";
+	function actualizarComentarioOrdenCompra( $dbh, $id, $valor ){
+		//Actualiza el comentario de una orden de compra
+		$q = "update purchases set comment = '$valor' where id = $id";
 		return mysqli_query( $dbh, $q );
 	}
 	/* ----------------------------------------------------------------------------------- */
@@ -234,21 +279,15 @@
 		echo json_encode( $res );
 	}
 	/* ----------------------------------------------------------------------------------- */
-	if( isset( $_POST["act_nota_oc"] ) ){
-		//Invoca el cambio de estado de una orden de compra
+	if( isset( $_GET["e_comment"] ) ){
+		//Invoca la actualización del comentario de una orden de compra
 		include( "bd.php" );
-
-		$idr 		= actualizarNotaOrdenCompra( $dbh, $_POST["act_nota_oc"], $_POST["valor"] );
+		$ido 		= $_POST["idorden"];
+		$idr 		= actualizarComentarioOrdenCompra( $dbh, $ido, $_POST["comentario"] );
 		
-		if ( ( $idr != 0 ) && ( $idr != "" ) ){
-			$res["exito"] = 1;
-			$res["mje"] = "Orden de compra actualizada con éxito";
-		} else {
-			$res["exito"] = 0;
-			$res["mje"] = "Error al actualizar orden de compra";
+		if( ( $idr != 0 ) && ( $idr != "" ) ){
+			header( "Location: ../purchase-data.php?purchase-id=$ido&comentario-exito" );
 		}
-
-		echo json_encode( $res );
 	}
 	/* ----------------------------------------------------------------------------------- */
 	if( isset( $_POST["editar_cants"] ) ){
@@ -259,8 +298,8 @@
 		$ok = true;
 
 		foreach( $items_oc as $i ) {
-			$item = get_object_vars( $i );
-			$ok = actualizarCantidadItemOC( $dbh, $idordenc, $item["iddoc"], $item["cant"] );
+			$item 	= get_object_vars( $i );
+			$ok 	= actualizarCantidadItemOC( $dbh, $idordenc, $item["iddoc"], $item["cant"] );
 		}
 
 		if( $ok ){
@@ -272,6 +311,27 @@
 		}
 
 		echo json_encode( $res );
+	}
+	/* ----------------------------------------------------------------------------------- */
+	if( isset( $_POST["popdataOC"] ) ){
+		//Invoca el cambio de estado de una orden de compra
+		include( "bd.php" );
+		$idOC 						= $_POST["popdataOC"];		// Id orden de compra
+		$iddp 						= $_POST["iddetalle"];		// Id detalle de producto
+		$idta 						= $_POST["idtalla"];		// Id talla
+
+		$ordenes 					= obtenerOCTallaproducto( $dbh, $idOC, $iddp, $idta );
+		$tabla 						= obtenerHistorialOC( $ordenes );
+		
+		if( $ordenes ){
+			$res["exito"] 			= 1;
+			$res["historial"] 		= $tabla;
+		} else {
+			$res["exito"] 			= -1;
+			$res["mje"] 			= "Error al obtener registros";
+		}
+
+		echo $tabla; //json_encode( $res );
 	}
 	/* ----------------------------------------------------------------------------------- */
 ?>

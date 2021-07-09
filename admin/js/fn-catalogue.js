@@ -85,18 +85,20 @@ function previoVisualCargaImgs( wait, param ){
         $("#btn_oimgs").prop( "disabled", true );
         $("#progreso_img").fadeIn(100);
     }else{
+        $("#nreg_result").html("");
         $("#tabla_datos-consulta").html( wait );
         $("#btn_rcatal").prop( "disabled", true );
     }
 }
 /* --------------------------------------------------------- */
-function posteriorVisualCargaImgs( param, si, data ){
+function posteriorVisualCargaImgs( param, si, data, nregs ){
     // Reasigna valores a elementos después de la invocación de generación de imágenes
 
     if( param != 'descargar' ){
         // Posterior a la obtención de resultados preliminares
         $("#btn_rcatal").prop( "disabled", false );
         $("#tabla_datos-consulta").html( data );
+        $("#nreg_result").html( nregs );
     }
     else {
         // Posterior a la generación de imágenes con texto.
@@ -108,6 +110,7 @@ function posteriorVisualCargaImgs( param, si, data ){
         });
         $("#response_img").html( data );
     }
+
     $("#btn_oimgs").show(10);
 }
 /* --------------------------------------------------------- */
@@ -129,8 +132,9 @@ function buscarImagenesCatalogo( form_r, param ){
         },
         success: function( response ){
             request.abort();
-            //console.log(response);
-            posteriorVisualCargaImgs( param, si, response );  
+            console.log(response);
+            resultado = jQuery.parseJSON(response);
+            posteriorVisualCargaImgs( param, si, resultado.contenido, resultado.nro_regs );  
         }
     });
 }
@@ -173,6 +177,12 @@ function formCatalValido( arrfrm ){
             valido = false;
             notificar( "Imágenes de catálogo", "Debe seleccionar perfil de cliente", "error" );
         }
+    }
+
+    if( !$(".chobtener").is(':checked') ){
+        // Si el check disponibles y ocultos están desmarcados
+        valido = false;
+        notificar( "Imágenes de catálogo", "Debe seleccionar disponible, ocultos o en desuso", "error" );
     }
 
     return valido;

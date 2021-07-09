@@ -80,6 +80,8 @@
 
     .view-first p{ max-height: 45px; }
 
+    #nreg_result{ font-size: 16px; }
+
   </style>
 
   <?php
@@ -375,16 +377,36 @@
                       </div>
                       <!-- ------------------------------------------------------------------------------- -->
                       <div class="ln_solid"></div>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Obtener</label>
+                        <div class="form-group">
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12"> </label>
+                          <div class="col-md-9 col-sm-9 col-xs-12">
+                            <div>
+                              <input id="chk_pdisp" type="checkbox" name="p_disponibles" class="flat chobtener" checked> 
+                              Disponibles
+                            </div>
+                          </div>
+                        </div>
 
                         <div class="form-group">
                           <label class="control-label col-md-3 col-sm-3 col-xs-12"> </label>
                           <div class="col-md-9 col-sm-9 col-xs-12">
                             <div>
-                              <input type="checkbox" name="p_ocultos" class="flat chocultos"> 
-                              Obtener sólo productos ocultos
+                              <input id="chk_pocultos" type="checkbox" name="p_ocultos" class="flat chobtener"> 
+                              Ocultos
                             </div>
                           </div>
                         </div>
+
+                        <div class="form-group">
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12"> </label>
+                          <div class="col-md-9 col-sm-9 col-xs-12">
+                            <div>
+                              <input id="chk_desuso" type="checkbox" name="p_desuso" class="flat chobtener"> 
+                              En desuso
+                            </div>
+                          </div>
+                        </div>                        
 
                       <div class="ln_solid"></div>
                       <!-- ------------------------------------------------------------------------------- -->
@@ -454,9 +476,9 @@
                 <div class="x_panel">
                   <div class="x_title">
                     <h2>Resultado</h2>
-                    <!--<ul class="nav navbar-right panel_toolbox">
-                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
-                    </ul>-->
+                    <ul class="nav navbar-right">
+                      <li><span id="nreg_result"></span></li>
+                    </ul>
 
                     <div class="clearfix"></div>
                   </div>

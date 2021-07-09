@@ -42,10 +42,10 @@
             <?php } ?>
             <div class="">
                 <label class="control-label">Fecha última reposición: </label> 
-                <span id="data-freposicion<?php echo $dp[id] ?>">
+                <span id="data-freposicion<?php echo $dp['id'] ?>">
                     <?php echo $dp["freposicion"]; ?></span> |
                 <button type="button" class="btn btn-info btn-xs act_frepos" 
-                data-id="<?php echo $dp[id] ?>">
+                data-id="<?php echo $dp['id'] ?>">
                     <i class="fa fa-arrow-circle-up"></i> Actualizar
                 </button>
             </div>
@@ -56,7 +56,7 @@
                 <input id="ub<?php echo $dp["id"]; ?>" class="txubc" type="text" 
                 value="<?php echo $dp["ubicacion"]; ?>" maxlength="20">
                 <button type="button" class="btn btn-info btn-xs act_ubicacion" 
-                    data-id="<?php echo $dp[id] ?>" title="Cambiar"> <i class="fa fa-save"></i>
+                    data-id="<?php echo $dp['id'] ?>" title="Cambiar"> <i class="fa fa-save"></i>
                 </button>
             </div>
         </div>
@@ -159,12 +159,12 @@
                         
                         <div id="ref_du">Fecha desuso: <?php echo $dp["fdesuso"] ?> </div>
                         <div class="opciones_producto_desuso">
-                            <a href="#!" class="pdisuse" data-id="<?php echo $dp[id] ?>">
+                            <a href="#!" class="pdisuse" data-id="<?php echo $dp['id'] ?>">
                                 <button type="button" class="btn btn-info btn-xs"> Cambiar </button>
                             </a>
                             <a href="#!">
                                 <button type="button" class="btn btn-warning btn-xs btn_not_disuse" 
-                                data-id="<?php echo $dp[id] ?>" title="Quitar estatus desuso"> 
+                                data-id="<?php echo $dp['id'] ?>" title="Quitar estatus desuso"> 
                                     <i class="fa fa-share-square"></i>
                                 </button>
                             </a>
@@ -173,7 +173,7 @@
                     <?php } else { ?> 
 
                         <div class="lnk_btnpdu"> 
-                            <a href="#!" class="pdisuse" data-id="<?php echo $dp[id] ?>">
+                            <a href="#!" class="pdisuse" data-id="<?php echo $dp['id'] ?>">
                                 <button type="button" class="btn btn-warning btn-xs"> 
                                     <i class="fa fa-history"></i> Producto en desuso
                                 </button>
@@ -181,27 +181,27 @@
                         </div>
                         
                     <?php } ?>
-                    <div id="pdu<?php echo $dp[id] ?>" class="bloq_refpdu">
+                    <div id="pdu<?php echo $dp['id'] ?>" class="bloq_refpdu">
                         <form class="frm_pdu">
                             <label class="control-label" title="Referencia">
                                 <i class="fa fa-angle-double-right"></i> Referencia: 
                             </label> 
-                            <input id="refdu-<?php echo $dp[id]; ?>" class="ref_desuso" type="text" 
+                            <input id="refdu-<?php echo $dp['id']; ?>" class="ref_desuso" type="text" 
                             value="" maxlength="20" data-ctg="<?php echo $producto[scid] ?>" 
-                            data-idd="<?php echo $dp[id] ?>">
-                            <input id="chk_sust<?php echo $dp[id]; ?>" type="checkbox" class="flat" name="ch_sust"> 
+                            data-idd="<?php echo $dp['id'] ?>">
+                            <input id="chk_sust<?php echo $dp['id']; ?>" type="checkbox" class="flat" name="ch_sust"> 
                                     Sustitución
                             <div class="form-group">
                                 
                                 <button type="button" class="btn btn-info btn-xs btn-ref-du" 
-                                    data-id="<?php echo $dp[id] ?>" title="Guardar">
+                                    data-id="<?php echo $dp['id'] ?>" title="Guardar">
                                     <i class="fa fa-save"></i> Guardar
                                 </button>
                             </div>
                             <div id="suggesstion-box"></div>
                                      
                         </form>
-                        <div id="refpv-<?php echo $dp[id] ?>">
+                        <div id="refpv-<?php echo $dp['id'] ?>">
                             
                         </div>    
                     </div>

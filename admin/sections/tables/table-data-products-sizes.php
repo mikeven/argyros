@@ -1,4 +1,4 @@
-<table id="dt-unavailable-products" class="table table-striped table-bordered">
+<table id="dt-product-sizes-preorder" class="table table-striped table-bordered">
   <thead>
     <tr>
       <th width="8%">Agotado</th>
@@ -11,4 +11,7 @@
     </tr>
   </thead>
 </table>
-<?php include( "sections/modals/product-image.php" ); ?>
+<?php 
+  include( "sections/modals/product-image.php" );
+  include( "sections/modals/purchase-data-history.html" ); 
+?>

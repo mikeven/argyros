@@ -9,7 +9,7 @@
 	function mostrarProductosConsulta( $productos ){
 		// Devuelve la estructura HTML del resultado de la consulta de productos
 
-		$resultado = "";
+		$contenido = "";
 		$bloque_img = file_get_contents( "../sections/image-catalog-report.php" );
 		if( $productos != NULL ){
 			foreach ( $productos as $reg ) {
@@ -29,9 +29,12 @@
 				$bloque_img = str_replace( "{desc}", 	$data_p["description"], $bloque_img );
 				$bloque_img = str_replace( "{link}", 	$link, 				$bloque_img );
 				
-				$resultado .= $bloque_img;
+				$contenido .= $bloque_img;
 			}
-		} else $resultado = "No hay resultados";
+		} else $contenido = "No hay resultados";
+
+		$resultado["contenido"] 	= $contenido;
+		$resultado["nro_regs"] 		= count( $productos );
 
 		return $resultado;
 	}
@@ -58,16 +61,19 @@
 		$id_reg_ag 			= array();
 		$visibilidad 		= true;
 		$cualquier_disp		= false;
+		$condicion_dsu		= false;
 
 		if( isset( $form["p_ocultos"] ) )
 			$visibilidad = false;
-		if( isset( $form["p_ocultos"] ) && isset( $form["p_disponibles"] ) ) $cualquier_disp = true;
+		if( cualquierDisponibilidad( $form ) ) $cualquier_disp = true;
 
 		foreach ( $registros as $reg ) {
 			$data = $reg["data"];
 			$tallas = $reg["tallas"];
+			$condicion_dsu	= condicionDesuso( $data, $form );
+
 			foreach ( $tallas as $t ) {
-				if( $t["visible"] == $visibilidad || $cualquier_disp ){
+				if( $t["visible"] == $visibilidad || $cualquier_disp || $condicion_dsu ){
 					if ( in_array( $t["idtalla"], $form["tallas"] ) && 
 						 !in_array( $data["id_det"], $id_reg_ag ) ){
 						$id_reg_ag[] = $data["id_det"];
@@ -82,28 +88,34 @@
 	/* ----------------------------------------------------------------------------------- */
 	function filtrarProductosPeso( $registros, $form ){
 		// Devuelve los registros que cumplen con los filtros de: peso
-		$productos 		= array();
-		$id_reg_ag 		= array();
-		$visibilidad 	= true;
+		$productos 			= array();
+		$id_reg_ag 			= array();
+		$visibilidad 		= true;
+		$cualquier_disp		= false;
+		$condicion_dsu		= false;
 		$min = $form["peso_min"]; $max = $form["peso_max"];
 
 		if( isset( $form["p_ocultos"] ) )
 			$visibilidad = false;	
+		if( cualquierDisponibilidad( $form ) ) $cualquier_disp = true;
 
 		foreach ( $registros as $reg ) {
-			$data = $reg["data"];
-			$tallas = $reg["tallas"];
+			$data 			= $reg["data"];
+			$tallas 		= $reg["tallas"];
+			$condicion_dsu	= condicionDesuso( $data, $form );
+
 			foreach ( $tallas as $t ) {
 				if( condicionIntervalo( $t["peso"], $min, $max ) ){
 					if( isset( $form["tallas"] ) ){
 						if ( !in_array( $data["id_det"], $id_reg_ag ) &&
 							  in_array( $t["idtalla"], $form["tallas"] ) &&  
-							  $t["visible"] == $visibilidad ){
+							  ( $t["visible"] == $visibilidad || $cualquier_disp || $condicion_dsu ) ){
 							$id_reg_ag[] = $data["id_det"];
 							$productos[] = $reg;
 						}
 					}else{
-						if ( !in_array( $data["id_det"], $id_reg_ag ) && $t["visible"] == $visibilidad ){
+						if ( !in_array( $data["id_det"], $id_reg_ag ) && 
+							( $t["visible"] == $visibilidad || $cualquier_disp || $condicion_dsu ) ){
 							$id_reg_ag[] = $data["id_det"];
 							$productos[] = $reg;
 						}
@@ -117,8 +129,15 @@
 	/* ----------------------------------------------------------------------------------- */
 	function filtrarProductosPrecio( $registros, $form, $tipo_filtro_precio ){
 		// Devuelve los registros que cumplen con los filtros de: precio por pieza/peso
-		$productos = array();
-		$id_reg_ag = array();
+		$productos 			= array();
+		$id_reg_ag 			= array();
+		$visibilidad 		= true;
+		$cualquier_disp		= false;
+		$condicion_dsu		= false;
+
+		if( isset( $form["p_ocultos"] ) )
+			$visibilidad = false;	
+		if( cualquierDisponibilidad( $form ) ) $cualquier_disp = true;
 
 		if( $tipo_filtro_precio == "pieza" ){
 			
@@ -126,16 +145,20 @@
 			foreach ( $registros as $reg ) {
 				$data = $reg["data"];
 				$tallas = $reg["tallas"];
+				$condicion_dsu	= condicionDesuso( $data, $form );
+
 				foreach ( $tallas as $t ) {
 					if( condicionIntervalo( $t["precio"], $min, $max ) ){
 						if( isset( $form["tallas"] ) ){
 							if ( !in_array( $data["id_det"], $id_reg_ag ) &&
-								  in_array( $t["idtalla"], $form["tallas"] ) ){
+								  in_array( $t["idtalla"], $form["tallas"] ) &&  
+							  ( $t["visible"] == $visibilidad || $cualquier_disp || $condicion_dsu ) ){
 								$id_reg_ag[] = $data["id_det"];
 								$productos[] = $reg;
 							}
 						}else{
-							if ( !in_array( $data["id_det"], $id_reg_ag ) ){
+							if ( !in_array( $data["id_det"], $id_reg_ag ) && 
+								( $t["visible"] == $visibilidad || $cualquier_disp || $condicion_dsu ) ){
 								$id_reg_ag[] = $data["id_det"];
 								$productos[] = $reg;
 							}
@@ -218,6 +241,28 @@
 
 		return filtrarNivelTalla( $productos, 1 );
 	}*/
+	/* ----------------------------------------------------------------------------------- */
+	function condicionDesuso( $data, $form ){
+		// Devuelve verdadero si un producto está en desuso y está marcado obtener productos en desuso
+		$condicion_desuso = false;
+
+		if( $data["desuso"] == 1 && isset( $form["p_desuso"] ) )
+			$condicion_desuso = true;
+		//if($data["id_det"] == 15052) echo "DU: ".$data["desuso"]." - CDU: $condicion_desuso";
+		return $condicion_desuso;
+	}
+	/* ----------------------------------------------------------------------------------- */
+	function cualquierDisponibilidad( $form ){
+		// Devuelve verdadero si en la selección del formulario se toma cualquier disponibilidad.
+		$cualquier_disp = false;
+
+		if( isset( $form["p_ocultos"] ) && isset( $form["p_disponibles"] ) || 
+			!isset( $form["p_ocultos"] ) && !isset( $form["p_disponibles"] ))
+			$cualquier_disp = true;
+
+		return $cualquier_disp;
+	}
+	/* ----------------------------------------------------------------------------------- */
 	function filtrarProductosDisponibilidad( $registros, $form ){
 		// Devuelve los productos filtrados por disponibilidad.
 		$productos_filtrados 	= array();
@@ -225,8 +270,8 @@
 		$cualquier_disp			= false;
 
 		if( isset( $form["p_ocultos"] ) )
-			$disponibilidad = false;
-		if( isset( $form["p_ocultos"] ) && isset( $form["p_disponibles"] ) ) $cualquier_disp = true;
+			$disponibilidad 	= false;
+		if( cualquierDisponibilidad( $form ) ) $cualquier_disp = true;
 		
 		foreach ( $registros as $reg ) {
 			if( $reg["disponible"] == $disponibilidad || $cualquier_disp )
@@ -240,13 +285,16 @@
 		// Devuelve los registros que cumplen con los filtros de: peso, precio
 		
 		$resultados = $registros;
+		$filtro_ini = false;
 
 		if( isset( $form["tallas"] ) && count( $form["tallas"] ) > 0 ){		// Filtrar por tallas
-			$resultados = filtrarProductosTalla( $registros, $form );	
+			$resultados = filtrarProductosTalla( $registros, $form );
+			$filtro_ini = true;	
 		}
 
 		if( $form["peso_min"] != "" || $form["peso_max"] != "" ){			// Filtrar por peso
-			$resultados = filtrarProductosPeso( $registros, $form );	
+			$resultados = filtrarProductosPeso( $registros, $form );
+			$filtro_ini = true;	
 		}
 
 		if( $form["prepza_min"] != "" || $form["prepza_max"] != "" ){		// Filtrar por precio (pieza)
@@ -257,8 +305,11 @@
 			$resultados = filtrarProductosPrecio( $resultados, $form, "peso" );		
 		}
 
-		$resultados = filtrarProductosDisponibilidad( $resultados, $form );
+		if( $filtro_ini == false ){
 
+			$resultados = filtrarProductosDisponibilidad( $resultados, $form );
+		}
+		
 		return $resultados;
 	}
 	/* ----------------------------------------------------------------------------------- */
@@ -270,18 +321,17 @@
 		return $lista;
 	}
 	/* ----------------------------------------------------------------------------------- */
-	function obtenerSubQueryValor( $qvalor, $valores ){
+	function obtenerSubQueryValor( $qvalor, $valores, $cond ){
 		// Construye la cadena and campo = valor or campo = valor para un query
 
 		if( count( $valores ) > 0 ){
 			$q = "and (";  
-			$conn = " or ";
 			$i = 0;
 			foreach ( $valores as $v ) {
 				$i++;
 				$q .= $qvalor." = ".$v;
 				if( count( $valores ) - $i > 0 )
-				$q .= $conn; 
+				$q .= $cond; 
 			}
 			$q .= ")";
 		} 
@@ -290,14 +340,22 @@
 		return $q;
 	}
 	/* ----------------------------------------------------------------------------------- */
-	function obtenerSubQueryParam( $qparam, $qvalor, $valores ){
-		// 
-	
+	function obtenerSubQueryParam( $qparam, $campo, $valores ){
+		// Devuelve el subquery con parámetros múltiples unidos con condición Y
+		//" lp{a}.product_id = p.id", "lp{a}.line_id", $form["linea"]
+		
 		$q = "";
-		if( count( $valores ) > 0 ){
-			$qv = obtenerSubQueryValor( $qvalor, $valores );
-			$q = "and ".$qparam." ".$qv;
+		$n = 1;
+
+		foreach ( $valores as $v ) {
+			$qunion 	= str_replace( "{a}", $n, $qparam );
+			$qvalor 	= str_replace( "{a}", $n, $campo );
+			$qv 		= obtenerSubQueryValorUnico( $qvalor, $v );
+			
+			$q 			.= " and ".$qunion." ".$qv;
+			$n++;
 		}
+
 		return $q;
 	}
 	/* ----------------------------------------------------------------------------------- */
@@ -359,9 +417,14 @@
 	function obtenerSubQueryProductosDesuso( $form ){
 		// Devuelve el subquery para filtrar proveedor
 		$desuso = "is null";
-		if( isset( $form["desuso"] ) ) $desuso = " = 1";
 
-		$sq = "and dp.disused $desuso";
+		if( isset( $form["p_desuso"] ) ){ 
+			$desuso = " = 1";
+			if( isset( $form["p_disponibles"] ) || isset( $form["p_ocultos"] ) ) 
+				$desuso = " = 1 or dp.disused is null";
+		}
+		
+		$sq = "and (dp.disused $desuso)";
 
 		return $sq;
 	}
@@ -379,6 +442,19 @@
 		return $sq;
 	}
 	/* ----------------------------------------------------------------------------------- */
+	function obtenerSubQueryTablas( $aliastabla, $valores ){
+		// Devuelve el subquery para indicar las tablas asociadas a múltiples valores de atributo
+		$sq = "";
+		$n 	= 1;
+
+		foreach ( $valores as $v ) {
+			$sq .= $aliastabla.$n.", ";
+			$n++;
+		}
+
+		return $sq;
+	}
+	/* ----------------------------------------------------------------------------------- */
 	function obtenerQueryConsulta( $dbh, $form ){
 		// Devuelve la consulta a bd de manera dinámica según los datos del formulario
 
@@ -393,7 +469,10 @@
 		$q_ta   = "";	//sub-query: talla 
 		$qdet 	= "";	//sub-query: condiciones para detalle de producto 
 		$q_sc 	= "";	//sub-query: subcategoría
+		$q_l 	= "";	//sub-query: línea
+		$q_t 	= "";	//sub-query: trabajo
 		$q_m	= "";	//sub-query: material
+		$q_b 	= "";	//sub-query: baño
 		$q_pa	= "";	//sub-query: país de origen
 		$q_kw	= "";	//sub-query: palabras claves
 		$q_fr	= "";	//sub-query: fecha reposición
@@ -403,8 +482,8 @@
 		$idc 	= $form["categoria"];
 		$idsc 	= $form["subcategoria"];
 
-		$q_l 	= obtenerSubQueryParam( "lp.product_id = p.id", "lp.line_id", $form["linea"] );
-		$q_t 	= obtenerSubQueryParam( "tp.product_id = p.id", "tp.making_id", $form["trabajo"] );
+		$q_l 	= obtenerSubQueryParam( "Lp{a}.product_id = p.id", "Lp{a}.line_id", 	$form["linea"] );
+		$q_t 	= obtenerSubQueryParam( "Tp{a}.product_id = p.id", "Tp{a}.making_id", 	$form["trabajo"] );
 
 		$q_m 	= obtenerSubQueryValorUnico( "p.material_id", $form["material"] );
 
@@ -424,9 +503,9 @@
 		if( $form["rango_frepos"] != "" )
 			$q_fr = obtenerSubQueryFechas( "repositioned_at", $form["rango_frepos"] );
 		
-		$q_b 	= obtenerSubQueryValor( "dp.treatment_id", $form["bano"] );
-		$q_co 	= obtenerSubQueryValor( "dp.color_id", $form["color"] );
-		$q_ta 	= obtenerSubQueryValor( "spd.size_id", $form["tallas"] );
+		$q_b 	= obtenerSubQueryValor( "dp.treatment_id", $form["bano"], " or " );
+		$q_co 	= obtenerSubQueryValor( "dp.color_id", $form["color"], " or " );
+		$q_ta 	= obtenerSubQueryValor( "spd.size_id", $form["tallas"], " or " );
 
 		if( $q_ta != "" ){
 			$idt 	= ", spd.size_id as idt";
@@ -434,17 +513,18 @@
 			$q_jta 	= "and spd.product_detail_id = dp.id";
 		}
 
-		if( $q_l != "" ) $t_lp = "line_product lp, ";
-		if( $q_t != "" ) $t_mp = "making_product tp, ";
+		if( $q_l != "" ) $t_lp = obtenerSubQueryTablas( "line_product Lp", $form["linea"] );//"line_product lp, ";
+		if( $q_t != "" ) $t_mp = obtenerSubQueryTablas( "making_product Tp", $form["trabajo"] );//"making_product tp, ";
 
 		if( $q_b != "" || $q_co != "" || $q_ta != "" ){ 
 			$qdet 	= " $q_b $q_co $q_jta $q_ta";
 		}
 
-		$query 	= "select p.id, p.code, p.name, p.description, p.visible, dp.id as id_det $idt  
+		$query 	= "select distinct dp.id as id_det $idt, p.id, p.code, p.name, p.description, p.visible, dp.disused as desuso 
 					from products p, $t_spd $t_mp $t_lp product_details dp 
 					where p.category_id = $idc $q_sc $q_pa $q_m $q_prv $q_l $q_t $q_kw $q_fr 
 					and dp.product_id = p.id $qdet $q_dsu";
+		
 		//echo $query;
 
 		return $query;
@@ -650,6 +730,7 @@
 		if( isset ( $form["ch_busq_id"] ) ){
 			
 			$registros_base = obtenerRegistrosPorIdentificador( $dbh, $datos );
+
 		}else{
 
 			$query_base 	= obtenerQueryConsulta( $dbh, $datos );	
@@ -657,6 +738,7 @@
 		}
 		
 		$lproductos = obtenerListadoProductosConsulta( $dbh, $registros_base, $form, $varg );
+		//print_r($lproductos);
 
 		$lproductos = filtrarProductosConsulta( $form, $lproductos );
 
@@ -691,7 +773,9 @@
 			$productos = obtenerProductosConsulta( $dbh, $form );
 			$_SESSION["regs_img_catal"] = $productos;
 			session_write_close();
-			echo mostrarProductosConsulta( $productos );
+
+			$resultados = mostrarProductosConsulta( $productos );
+			echo json_encode( $resultados );
 		}
 	}
 	/* ----------------------------------------------------------------------------------- */

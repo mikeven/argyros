@@ -383,8 +383,9 @@
 		$asociado_oc 		= registroAsociadoTabla2P( $dbh, "purchase_details", "product_detail_id", $iddet, 
 													   "size_id", $idtalla );
 
-		if( $asociado_pedidos || $asociado_oc ) 
+		if( $asociado_pedidos || $asociado_oc ){ 
 			$asociaciones 	= true;
+		}
 		
 		return $asociaciones;
 	} 

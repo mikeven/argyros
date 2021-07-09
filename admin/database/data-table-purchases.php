@@ -5,7 +5,7 @@
 	/* ----------------------------------------------------------------------------------- */
 	function obtenerOrdenesCompra( $dbh ){
 		//Devuelve el registro de las órdenes registradas
-		$q = "select o.id, o.status as estado, o.note as nota, date_format( o.created_at,'%d/%m/%Y') as fecha, 
+		$q = "select o.id, o.status as estado, o.comment as comentario, date_format( o.created_at,'%d/%m/%Y') as fecha, 
 		p.id as idpvd, p.name as nombre, p.number as numero, u.first_name as nombre_u, u.last_name as apellido_u 
 		from purchases o, providers p, users u 
 		where o.provider_id = p.id and o.user_id = u.id order by o.created_at DESC";
@@ -104,6 +104,7 @@
 		$reg_orden["orden"] 		= $link_orden;
 		$reg_orden["proveedor"] 	= "<a href='$lnk_pvd' target='_blank'>".$o["nombre"]." ".$o["numero"]."</a>";
 		$reg_orden["fecha"] 		= $o["fecha"];
+		$reg_orden["comentario"] 	= $o["comentario"];
 		$reg_orden["total"] 		= $totales;
 		$reg_orden["status"] 		= $iconoe." ".$o["estado"];
 		

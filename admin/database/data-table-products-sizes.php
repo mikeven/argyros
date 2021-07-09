@@ -44,7 +44,7 @@
 		date_format(dp.created_at,'%d/%m/%Y %h:%i:%s %p') as fcreado 
 		FROM product_details dp, products p, categories ca, subcategories sc 
 		WHERE dp.product_id = p.id and p.category_id = ca.id and p.subcategory_id = sc.id 
-		ORDER BY dp.unavailable_at DESC limit 500";
+		ORDER BY dp.unavailable_at DESC";
 		
 		$lista = obtenerListaRegistros( mysqli_query( $dbh, $q ) );
 		
@@ -65,7 +65,7 @@
 	/* ----------------------------------------------------------------------------------- */
 	function obtenerUltimaOCTallaProducto( $dbh, $dp, $idt ){
 		// Devuelve la última orden de compra donde fue incluida una talla de producto
-		$q = "select o.id as ido, doc.status as estado 
+		$q = "select o.id as ido, o.comment as observacion, doc.status as estado 
 				from purchases o, purchase_details doc 
 				where doc.size_id = $idt and product_detail_id = $dp[d_id] 
 				and doc.purchase_id = o.id and o.status <> 'recibida' and o.status <> 'cancelada'
@@ -74,11 +74,11 @@
 		return mysqli_fetch_array( mysqli_query( $dbh, $q ) );
 	}
 	/* ----------------------------------------------------------------------------------- */
-	function obtenerEnlaceOCPorTalla( $oc ){
+	function obtenerEnlaceOCPorTalla( $oc, $idd, $idta ){
 		// Devuelve el enlace a una orden de compra donde fue incluida una talla
-		$lnk = "";
-
-		$clase_st = array( 
+		$lnk 		= "";
+		$ido 		= $oc['ido'];
+		$clase_st 	= array( 
 			"pendiente" 	=> "it_oc_pen",
 			"recibido"		=> "it_oc_rec",
 			"no-recibido"	=> "it_oc_nor" 
@@ -87,7 +87,9 @@
 		if( $oc["ido"] != "" ){
 			$clase = $clase_st[ $oc["estado"] ];
 			$url = "purchase-data.php?purchase-id=$oc[ido]";
-			$lnk = "<a href='$url' class='$clase' target='_blank'>#".$oc['ido']."</a>";
+			$lnk = "<a href='#!' class='$clase pop-purch-data' 
+						data-toggle='modal' data-target='#purchase-data-pop' 
+						data-idoc='$ido' data-iddt='$idd' data-idta='$idta'>#".$ido."</a>";
 		}
 
 		return $lnk;
@@ -98,8 +100,8 @@
 		$html_ta 	= "";
 
 		foreach ( $tallas as $t ) {
-			$oc = obtenerUltimaOCTallaProducto( $dbh, $dp, $t["idtalla"] );
-			$lnk_oc = obtenerEnlaceOCPorTalla( $oc );
+			$oc 		= obtenerUltimaOCTallaProducto( $dbh, $dp, $t["idtalla"] );
+			$lnk_oc 	= obtenerEnlaceOCPorTalla( $oc, $dp["d_id"], $t["idtalla"] );
 
 			if( $t["visible"] == 1 )  $class = "dsp_total"; else $class = "dsp_agotado";
 
@@ -212,7 +214,7 @@
 		$data_productos["data"][] = $reg_prod;
 		
 	}
-
+	ini_set('memory_limit', '256M');
 	echo json_encode( $data_productos );
 	
 	/* ----------------------------------------------------------------------------------- */

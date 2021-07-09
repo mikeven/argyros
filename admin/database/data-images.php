@@ -117,16 +117,24 @@
 	}
 	/* ---------------------------------------- */
 	function pesoP( $r, $f ){
-		$peso = NULL;
+		$peso 			= NULL;
+		$val_v 			= 1;
+		$cualquier_disp = false;
 	
 		if( isset( $f["p_pep"] ) ){
 			foreach ( $r["tallas"] as $talla ) {
-				if( $talla["visible"] == 1 ){
+				if( isset( $f["p_ocultos"] ) ) $val_v = 0;
+				if( isset( $f["p_ocultos"] ) && isset( $f["p_disponibles"] ) ) $cualquier_disp = true;
+
+				if( $talla["visible"] == $val_v || $cualquier_disp ){
+					$peso = $talla["peso"]."g"; break;
+				}
+				/*if( $talla["visible"] == 1 ){
 					$peso = $talla["peso"]."g"; break;
 				}
 				if( isset( $f["p_ocultos"] ) ){
 					$peso = $talla["peso"]."g"; break;
-				}
+				}*/
 			}
 		}
 		
@@ -146,15 +154,18 @@
 	}
 	/* ---------------------------------------- */
 	function tallasP( $r, $f ){
-		$v_tallas = NULL;
-		$val_v = 1;
+		$v_tallas 		= NULL;
+		$val_v 			= 1;
+		$cualquier_disp = false;
+
 		if( isset( $f["p_tal"] ) ){
 			$v_tallas = "T: ";
 			$rt 	= $r["tallas"];
 			foreach ( $rt as $t ) {
 				if( isset( $f["p_ocultos"] ) ) $val_v = 0;
+				if( isset( $f["p_ocultos"] ) && isset( $f["p_disponibles"] ) ) $cualquier_disp = true;
 					
-				if( $t["visible"] == $val_v )
+				if( $t["visible"] == $val_v || $cualquier_disp )
 						$v_tallas .= $t["talla"].$t["unidad"].", ";
 			}
 		}
@@ -264,7 +275,9 @@
 		eliminarImagenesGeneradas();
 		eliminarZipsGenerados();
 
-		echo $enl;
+		$resultados["contenido"]	= $enl;
+		
+		echo json_encode( $resultados );
 	}
 	/* ------------------------------------------------------------------------------ */
 ?>
