@@ -155,6 +155,12 @@
 			background-color: #a7b239;
 			width: auto; float: left;
 		}
+		.tfilt-r{
+			font-size: 12px; padding: 2px 6px; 
+			margin-right: 2px; color: #000;
+			background-color: #e7e7e7;
+			width: auto; float: left;
+		}
 
 		#contenido_bloque_filtros{
 			width: 100%;
