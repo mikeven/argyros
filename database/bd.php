@@ -3,17 +3,35 @@
 	/* ----------------------------------------------------------------------------------- */
 	/*
 	*/
+	$cfg = obtenerConfigBD();
 
-	$servidor = "127.0.0.1";
-	$usuariobd = "argyrosa_bd";
-	$passbd = "argyros@bd";
-	$basedatos = "argyrosa_20";
-	//require_once($_SERVER['DOCUMENT_ROOT'].'/lib/FirePHPCore/fb.php');
+	$server 	= $cfg["server"];
+	$dbuser 	= $cfg["username"];
+	$dbpass 	= $cfg["password"];
+	$database 	= $cfg["database"];
 	
-	$dbh = mysqli_connect ( $servidor, $usuariobd, $passbd ) or die('No se puede conectar a '.$servidor.": ". mysqli_error($dbh));
-	mysqli_select_db ( $dbh, $basedatos );
+	$dbh = mysqli_connect ( $server, $dbuser, $dbpass ) 
+	or die('No se puede conectar a '.$server.": ". mysql_error());
+	mysqli_select_db ( $dbh, $database );
 	mysqli_query( $dbh, "SET NAMES 'utf8'" );
-	/* ----------------------------------------------------------------------------------- */
+
+	/* --------------------------------------------------------- */
+	/* --------------------------------------------------------- */
+	function obtenerConfigBD(){
+		//
+		$config = array();
+		$file = fopen( __DIR__."/database.ini", "r" ) or exit( "Error al leer archivo" );
+		
+		fgets( $file );
+		while( !feof( $file ) )	{
+			list( $key, $val ) = explode('=', fgets( $file ) );
+			$config[$key] = trim( $val );
+		}
+
+		fclose( $file );
+
+		return $config;
+	}
 	/* ----------------------------------------------------------------------------------- */
 	function cambiaf_a_mysql( $fecha ){
 		//Obtiene una fecha del formato dd/mm/YYYY al formato YYYY-mm-dd
