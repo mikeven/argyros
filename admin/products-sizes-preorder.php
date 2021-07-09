@@ -195,7 +195,7 @@
     <script src="vendors/pnotify/dist/pnotify.nonblock.js"></script>
 
     <!-- Custom Theme Scripts -->
-    <script src="js/fn-purchase.js"></script>
+    
     <script src="js/custom.js"></script>
     
     <script src="js/fn-ui.js"></script>
@@ -209,7 +209,7 @@
         $.fn.dataTable.moment('DD/MM/YYYY hh:mm:ss A');
 
         $(document).ready(function() {
-            $('#dt-unavailable-products').dataTable({
+            $('#dt-product-sizes-preorder').dataTable({
                 
                 "ajax": { 
                     "method":"POST",
@@ -256,11 +256,14 @@
                     }
                 }
             });
-            var table = $('#dt-unavailable-products').DataTable();
+            var table = $('#dt-product-sizes-preorder').DataTable();
             // Ordenar por columna cero, dibujar
             table.order( [ 0, 'desc' ] ).draw();
+
+            
+
         });   
     </script>
-	
+	  <script src="js/fn-purchase.js"></script>
   </body>
 </html>

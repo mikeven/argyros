@@ -128,43 +128,7 @@
                                   
                                     <div class="x_content">
                                         
-                                        <div class="form-group">
-                                            <label class="control-label">Orden: </label> <?php echo "#".$orden["id"]; ?>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="control-label">Fecha: </label> <?php echo $orden["fecha"]; ?>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="control-label">Ítems: </label> <?php echo count( $ids_detalles_oc ); ?>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="control-label">Cantidades: </label> 
-                                            <?php echo $totales["cant"]." ( $peso_aprox gr apróx. )"; ?>
-                                        </div>
-                                        
-                                        <hr>
-
-                                        <div class="form-group">
-                                            <label class="control-label">Proveedor: </label> 
-                                            <a href="provider.php?id=<?php echo $orden['idpvd'] ?>" target="_blank">
-                                                <?php echo "#".$orden["idpvd"]; ?>
-                                                <?php echo $orden["nombre"]." ".$orden["numero"]; ?>
-                                            </a>
-                                        </div>
-
-                                        <hr>
-
-                                        <?php include( "sections/purchase-options.php" ); ?>
-
-                                        <div class="form-group">
-                                            <a href="purchase-print.php?purchase-id=<?php echo $orden['id'] ?>" 
-                                                class="btn btn-app" target="_blank">
-                                              <i class="fa fa-file-text-o"></i> Imprimir
-                                            </a>
-                                        </div>
-
-                                        <div id="res_serv"></div>
+                                        <?php include( "sections/purchase-info.php" ); // Tabla con registro de notas ?>
 
                                         <hr>
 
@@ -179,7 +143,7 @@
                                             <div class="nota_orden_compra">
                                               <textarea class="form-control" placeholder="Nota" name="nota" required></textarea>
                                             </div>
-                                            <div id="area_rsp_pedido" class="form-group">
+                                            <div class="form-group">
                                                 <div align="center">
                                                     <button type="submit" class="btn btn-info btn-xs">Guardar</button>
                                                 </div> 
@@ -357,12 +321,6 @@
             table.order( [ 0, 'desc' ] ).draw();
         });   
     </script>
-
-    <?php if( isset( $_GET["nueva_nota-exito"] ) ){ ?>
-        <script>
-          notificar( "Orden de Compra", "Nueva nota agregada con éxito", "success" );
-        </script>
-    <?php } ?>
-
+    <?php include( "fn/fn-purchase-msg.php" ); ?>
   </body>
 </html>

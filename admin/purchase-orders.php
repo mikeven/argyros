@@ -181,6 +181,7 @@
                 {"data":"orden"},
                 {"data":"proveedor"},
                 {"data":"fecha"},
+                {"data":"comentario"},
                 {"data":"total"},
                 {"data":"status"},
             ],
